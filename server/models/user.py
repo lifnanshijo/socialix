@@ -56,7 +56,7 @@ class User:
         updates = []
         params = []
         
-        if username:
+        if username is not None and username != '':
             updates.append("username = %s")
             params.append(username)
         if bio is not None:

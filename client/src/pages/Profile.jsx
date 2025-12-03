@@ -6,6 +6,8 @@ import '../styles/profile.css'
 function Profile() {
   const { user, updateProfile } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const [profileData, setProfileData] = useState({
     username: '',
     bio: '',
@@ -33,12 +35,38 @@ function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
+    setError('')
     try {
-      await updateProfile(profileData)
-      setIsEditing(false)
+      const result = await updateProfile({
+        username: profileData.username,
+        bio: profileData.bio
+      })
+      if (result) {
+        setProfileData(prev => ({
+          ...prev,
+          username: result.username || prev.username,
+          bio: result.bio || prev.bio
+        }))
+        setIsEditing(false)
+        alert('Profile updated successfully!')
+      }
     } catch (err) {
       console.error('Profile update failed:', err)
+      setError(err.message || 'Failed to update profile')
+      alert('Error: ' + (err.message || 'Failed to update profile'))
+    } finally {
+      setLoading(false)
     }
+  }
+
+  const handleImageUpload = (updatedUser) => {
+    // Update local state with new image URLs
+    setProfileData({
+      ...profileData,
+      avatar: updatedUser.avatar || profileData.avatar,
+      coverImage: updatedUser.coverImage || profileData.coverImage
+    })
   }
 
   return (
@@ -60,17 +88,21 @@ function Profile() {
           <button 
             className="btn btn-primary edit-btn"
             onClick={() => setIsEditing(!isEditing)}
+            disabled={loading}
           >
             {isEditing ? 'Cancel' : 'Edit Profile'}
           </button>
         </div>
       </div>
 
+      {error && <div className="error-message">{error}</div>}
+
       {isEditing && (
         <ProfileCustomization
           profileData={profileData}
           handleChange={handleChange}
           handleSubmit={handleSubmit}
+          onImageUpload={handleImageUpload}
         />
       )}
 

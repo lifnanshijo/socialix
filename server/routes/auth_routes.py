@@ -33,7 +33,7 @@ def signup():
             return jsonify({'message': 'Failed to create user'}), 500
 
         # Generate token
-        access_token = create_access_token(identity=user['id'])
+        access_token = create_access_token(identity=str(user['id']))
 
         return jsonify({
             'token': access_token,
@@ -64,7 +64,7 @@ def login():
             return jsonify({'message': 'Invalid credentials'}), 401
 
         # Generate token
-        access_token = create_access_token(identity=user['id'])
+        access_token = create_access_token(identity=str(user['id']))
 
         return jsonify({
             'token': access_token,
@@ -119,7 +119,7 @@ def google_auth():
                     user = User.find_by_id(user['id'])
 
             # Generate token
-            access_token = create_access_token(identity=user['id'])
+            access_token = create_access_token(identity=str(user['id']))
 
             return jsonify({
                 'token': access_token,

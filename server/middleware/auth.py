@@ -7,9 +7,14 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         try:
+            # Debug: Print auth header
+            auth_header = request.headers.get('Authorization')
+            print(f"Auth Header: {auth_header}")
+            
             verify_jwt_in_request()
             return f(*args, **kwargs)
         except Exception as e:
+            print(f"Auth Error: {str(e)}")
             return jsonify({'message': 'Token is invalid or expired'}), 401
     return decorated
 
@@ -18,6 +23,8 @@ def get_current_user():
     try:
         verify_jwt_in_request()
         user_id = get_jwt_identity()
+        # Convert to int since user ID is stored as int in database
+        user_id = int(user_id) if isinstance(user_id, str) else user_id
         user = User.find_by_id(user_id)
         return User.to_dict(user)
     except:

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='uploads', static_url_path='/uploads')
 
 # Configuration
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-this')
