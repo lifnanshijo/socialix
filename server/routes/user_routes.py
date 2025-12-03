@@ -2,15 +2,12 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity
 from models.user import User
 from middleware.auth import token_required
-from werkzeug.utils import secure_filename
-import os
-from datetime import datetime
 import mimetypes
+import os
 
 user_bp = Blueprint('users', __name__)
 
 # Configuration
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
@@ -18,10 +15,15 @@ def allowed_file(filename):
     """Check if file extension is allowed"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_upload_file(file, subfolder):
-    """Save uploaded file and return the path"""
+def get_mime_type(filename):
+    """Get MIME type of file"""
+    mime_type, _ = mimetypes.guess_type(filename)
+    return mime_type or 'image/jpeg'
+
+def read_image_to_blob(file):
+    """Read image file and return binary data"""
     if not file or file.filename == '':
-        return None
+        return None, None
     
     if not allowed_file(file.filename):
         raise ValueError('File type not allowed. Use: PNG, JPG, JPEG, GIF, WebP')
@@ -34,21 +36,11 @@ def save_upload_file(file, subfolder):
     if file_size > MAX_FILE_SIZE:
         raise ValueError('File size exceeds 5MB limit')
     
-    # Create folder if it doesn't exist
-    folder_path = os.path.join(UPLOAD_FOLDER, subfolder)
-    os.makedirs(folder_path, exist_ok=True)
+    # Read file content as bytes
+    image_data = file.read()
+    mime_type = get_mime_type(file.filename)
     
-    # Generate unique filename
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
-    filename = secure_filename(file.filename)
-    filename = timestamp + filename
-    
-    # Save file
-    filepath = os.path.join(folder_path, filename)
-    file.save(filepath)
-    
-    # Return relative path for storage in database
-    return f'/uploads/{subfolder}/{filename}'
+    return image_data, mime_type
 
 @user_bp.route('/profile', methods=['GET'])
 @token_required
@@ -69,16 +61,37 @@ def get_profile():
 @user_bp.route('/profile', methods=['PUT'])
 @token_required
 def update_profile():
-    """Update user profile"""
+    """Update user profile with image uploads stored as BLOB"""
     try:
         user_id = get_jwt_identity()
         user_id = int(user_id) if isinstance(user_id, str) else user_id
-        data = request.get_json()
         
-        username = data.get('username')
-        bio = data.get('bio')
-        avatar = data.get('avatar')
-        cover_image = data.get('coverImage')
+        username = request.form.get('username')
+        bio = request.form.get('bio')
+        avatar_blob = None
+        avatar_type = None
+        cover_image_blob = None
+        cover_image_type = None
+        
+        # Get current user to preserve existing images
+        current_user = User.find_by_id(user_id)
+        if current_user:
+            avatar_blob = current_user.get('avatar')
+            avatar_type = current_user.get('avatar_type')
+            cover_image_blob = current_user.get('cover_image')
+            cover_image_type = current_user.get('cover_image_type')
+        
+        # Handle avatar upload
+        if 'avatar' in request.files:
+            avatar_file = request.files['avatar']
+            if avatar_file and avatar_file.filename:
+                avatar_blob, avatar_type = read_image_to_blob(avatar_file)
+        
+        # Handle cover image upload
+        if 'cover_image' in request.files:
+            cover_file = request.files['cover_image']
+            if cover_file and cover_file.filename:
+                cover_image_blob, cover_image_type = read_image_to_blob(cover_file)
         
         # Check if username is already taken by another user
         if username:
@@ -86,13 +99,23 @@ def update_profile():
             if existing_user and existing_user['id'] != user_id:
                 return jsonify({'message': 'Username already taken'}), 400
         
-        # Update profile
-        user = User.update_profile(user_id, username, bio, avatar, cover_image)
+        # Update profile with BLOB data
+        user = User.update_profile(
+            user_id, 
+            username=username, 
+            bio=bio, 
+            avatar=avatar_blob,
+            avatar_type=avatar_type,
+            cover_image=cover_image_blob,
+            cover_image_type=cover_image_type
+        )
         
         if not user:
             return jsonify({'message': 'Failed to update profile'}), 500
         
         return jsonify(User.to_dict(user)), 200
+    except ValueError as e:
+        return jsonify({'message': str(e)}), 400
     except Exception as e:
         return jsonify({'message': str(e)}), 500
 
@@ -109,64 +132,6 @@ def get_user(user_id):
     except Exception as e:
         return jsonify({'message': str(e)}), 500
 
-@user_bp.route('/profile/upload-avatar', methods=['POST'])
-@token_required
-def upload_avatar():
-    """Upload user avatar image"""
-    try:
-        user_id = get_jwt_identity()
-        user_id = int(user_id) if isinstance(user_id, str) else user_id
-        
-        if 'file' not in request.files:
-            return jsonify({'message': 'No file provided'}), 400
-        
-        file = request.files['file']
-        avatar_path = save_upload_file(file, 'avatars')
-        
-        # Update user profile with new avatar
-        user = User.update_profile(user_id, avatar=avatar_path)
-        
-        if not user:
-            return jsonify({'message': 'Failed to update avatar'}), 500
-        
-        return jsonify({
-            'message': 'Avatar uploaded successfully',
-            'user': User.to_dict(user)
-        }), 200
-    except ValueError as e:
-        return jsonify({'message': str(e)}), 400
-    except Exception as e:
-        return jsonify({'message': str(e)}), 500
-
-@user_bp.route('/profile/upload-cover', methods=['POST'])
-@token_required
-def upload_cover():
-    """Upload user cover image"""
-    try:
-        user_id = get_jwt_identity()
-        user_id = int(user_id) if isinstance(user_id, str) else user_id
-        
-        if 'file' not in request.files:
-            return jsonify({'message': 'No file provided'}), 400
-        
-        file = request.files['file']
-        cover_path = save_upload_file(file, 'covers')
-        
-        # Update user profile with new cover image
-        user = User.update_profile(user_id, cover_image=cover_path)
-        
-        if not user:
-            return jsonify({'message': 'Failed to update cover image'}), 500
-        
-        return jsonify({
-            'message': 'Cover image uploaded successfully',
-            'user': User.to_dict(user)
-        }), 200
-    except ValueError as e:
-        return jsonify({'message': str(e)}), 400
-    except Exception as e:
-        return jsonify({'message': str(e)}), 500
-
 @user_bp.route('/search', methods=['GET'])
 def search_users():
     """Search users by username"""
@@ -180,7 +145,8 @@ def search_users():
         from config.database import execute_query
         
         search_query = """
-            SELECT * FROM users 
+            SELECT id, username, email, bio, avatar_type, cover_image_type, created_at, updated_at
+            FROM users 
             WHERE username LIKE %s 
             LIMIT 20
         """
@@ -189,3 +155,4 @@ def search_users():
         return jsonify([User.to_dict(user) for user in users]), 200
     except Exception as e:
         return jsonify({'message': str(e)}), 500
+

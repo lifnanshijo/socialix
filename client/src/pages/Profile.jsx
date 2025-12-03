@@ -4,10 +4,8 @@ import ProfileCustomization from '../components/ProfileCustomization'
 import '../styles/profile.css'
 
 function Profile() {
-  const { user, updateProfile } = useAuth()
+  const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [profileData, setProfileData] = useState({
     username: '',
     bio: '',
@@ -21,7 +19,7 @@ function Profile() {
         username: user.username || '',
         bio: user.bio || '',
         avatar: user.avatar || '',
-        coverImage: user.coverImage || ''
+        coverImage: user.cover_image || ''
       })
     }
   }, [user])
@@ -33,40 +31,14 @@ function Profile() {
     })
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    try {
-      const result = await updateProfile({
-        username: profileData.username,
-        bio: profileData.bio
-      })
-      if (result) {
-        setProfileData(prev => ({
-          ...prev,
-          username: result.username || prev.username,
-          bio: result.bio || prev.bio
-        }))
-        setIsEditing(false)
-        alert('Profile updated successfully!')
-      }
-    } catch (err) {
-      console.error('Profile update failed:', err)
-      setError(err.message || 'Failed to update profile')
-      alert('Error: ' + (err.message || 'Failed to update profile'))
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleImageUpload = (updatedUser) => {
     // Update local state with new image URLs
     setProfileData({
       ...profileData,
       avatar: updatedUser.avatar || profileData.avatar,
-      coverImage: updatedUser.coverImage || profileData.coverImage
+      coverImage: updatedUser.cover_image || profileData.coverImage
     })
+    setIsEditing(false)
   }
 
   return (
@@ -88,20 +60,16 @@ function Profile() {
           <button 
             className="btn btn-primary edit-btn"
             onClick={() => setIsEditing(!isEditing)}
-            disabled={loading}
           >
             {isEditing ? 'Cancel' : 'Edit Profile'}
           </button>
         </div>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
-
       {isEditing && (
         <ProfileCustomization
           profileData={profileData}
           handleChange={handleChange}
-          handleSubmit={handleSubmit}
           onImageUpload={handleImageUpload}
         />
       )}
@@ -111,7 +79,7 @@ function Profile() {
         <div className="about-section">
           <p><strong>Username:</strong> {profileData.username}</p>
           <p><strong>Email:</strong> {user?.email}</p>
-          <p><strong>Member since:</strong> {new Date(user?.createdAt).toLocaleDateString()}</p>
+          <p><strong>Member since:</strong> {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</p>
         </div>
       </div>
     </div>

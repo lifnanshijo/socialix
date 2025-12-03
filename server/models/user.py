@@ -1,6 +1,7 @@
 from config.database import execute_query
 import bcrypt
 from datetime import datetime
+import base64
 
 class User:
     @staticmethod
@@ -51,8 +52,8 @@ class User:
         return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
 
     @staticmethod
-    def update_profile(user_id, username=None, bio=None, avatar=None, cover_image=None):
-        """Update user profile"""
+    def update_profile(user_id, username=None, bio=None, avatar=None, avatar_type=None, cover_image=None, cover_image_type=None):
+        """Update user profile with BLOB images"""
         updates = []
         params = []
         
@@ -65,9 +66,15 @@ class User:
         if avatar is not None:
             updates.append("avatar = %s")
             params.append(avatar)
+        if avatar_type is not None:
+            updates.append("avatar_type = %s")
+            params.append(avatar_type)
         if cover_image is not None:
             updates.append("cover_image = %s")
             params.append(cover_image)
+        if cover_image_type is not None:
+            updates.append("cover_image_type = %s")
+            params.append(cover_image_type)
         
         if not updates:
             return User.find_by_id(user_id)
@@ -82,12 +89,34 @@ class User:
         """Convert user object to dictionary (excluding password)"""
         if not user:
             return None
+        
+        # Convert BLOB images to base64 for JSON serialization
+        avatar_data = None
+        if user.get('avatar'):
+            avatar_type = user.get('avatar_type', 'image/jpeg')
+            avatar_bytes = user.get('avatar')
+            if isinstance(avatar_bytes, bytes):
+                avatar_b64 = base64.b64encode(avatar_bytes).decode('utf-8')
+                avatar_data = f"data:{avatar_type};base64,{avatar_b64}"
+            else:
+                avatar_data = avatar_bytes
+        
+        cover_image_data = None
+        if user.get('cover_image'):
+            cover_type = user.get('cover_image_type', 'image/jpeg')
+            cover_bytes = user.get('cover_image')
+            if isinstance(cover_bytes, bytes):
+                cover_b64 = base64.b64encode(cover_bytes).decode('utf-8')
+                cover_image_data = f"data:{cover_type};base64,{cover_b64}"
+            else:
+                cover_image_data = cover_bytes
+        
         return {
             'id': user['id'],
             'username': user['username'],
             'email': user['email'],
             'bio': user.get('bio'),
-            'avatar': user.get('avatar'),
-            'coverImage': user.get('cover_image'),
+            'avatar': avatar_data,
+            'coverImage': cover_image_data,
             'createdAt': user['created_at'].isoformat() if isinstance(user['created_at'], datetime) else user['created_at']
         }

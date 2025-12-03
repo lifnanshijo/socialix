@@ -1,84 +1,97 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 
+const API_URL = 'http://localhost:5000'
+
 function ProfileCustomization({ profileData, handleChange, handleSubmit, onImageUpload = null }) {
   const [avatarPreview, setAvatarPreview] = useState(profileData.avatar || '')
   const [coverPreview, setCoverPreview] = useState(profileData.coverImage || '')
+  const [avatarFile, setAvatarFile] = useState(null)
+  const [coverFile, setCoverFile] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
-
-  const uploadImage = async (file, type) => {
-    if (!file) return
-
-    setUploading(true)
-    setUploadError('')
-    
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const endpoint = type === 'avatar' 
-        ? '/api/users/profile/upload-avatar' 
-        : '/api/users/profile/upload-cover'
-
-      const token = localStorage.getItem('token')
-      console.log('Token:', token ? 'Present' : 'Missing')
-      console.log('Uploading to:', endpoint)
-      
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-
-      const response = await axios.post(endpoint, formData, config)
-
-      console.log('Upload response:', response.data)
-
-      if (response.data.user) {
-        if (type === 'avatar') {
-          setAvatarPreview(response.data.user.avatar)
-        } else {
-          setCoverPreview(response.data.user.coverImage)
-        }
-        
-        if (onImageUpload) {
-          onImageUpload(response.data.user)
-        }
-        
-        alert(`${type === 'avatar' ? 'Profile picture' : 'Cover image'} uploaded successfully!`)
-      }
-    } catch (err) {
-      console.error('Upload error:', err)
-      const errorMsg = err.response?.data?.message || err.message || 'Upload failed'
-      setUploadError(errorMsg)
-      alert(`Error: ${errorMsg}`)
-    } finally {
-      setUploading(false)
-    }
-  }
 
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0]
     if (file) {
+      setAvatarFile(file)
       const reader = new FileReader()
       reader.onload = (event) => {
         setAvatarPreview(event.target.result)
       }
       reader.readAsDataURL(file)
-      uploadImage(file, 'avatar')
     }
   }
 
   const handleCoverChange = (e) => {
     const file = e.target.files?.[0]
     if (file) {
+      setCoverFile(file)
       const reader = new FileReader()
       reader.onload = (event) => {
         setCoverPreview(event.target.result)
       }
       reader.readAsDataURL(file)
-      uploadImage(file, 'cover')
+    }
+  }
+
+  const handleSaveChanges = async (e) => {
+    e.preventDefault()
+    setUploading(true)
+    setUploadError('')
+
+    try {
+      const token = localStorage.getItem('token')
+      const formData = new FormData()
+
+      // Add profile data
+      formData.append('username', profileData.username)
+      formData.append('bio', profileData.bio)
+
+      // Add files if selected
+      if (avatarFile) {
+        formData.append('avatar', avatarFile)
+      }
+      if (coverFile) {
+        formData.append('cover_image', coverFile)
+      }
+
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+
+      console.log('Sending update to:', `${API_URL}/api/users/profile`)
+      const response = await axios.put(`${API_URL}/api/users/profile`, formData, config)
+
+      console.log('Profile update response:', response.data)
+
+      if (response.data) {
+        // Update previews and clear file inputs
+        if (response.data.avatar) {
+          setAvatarPreview(response.data.avatar)
+        }
+        if (response.data.cover_image) {
+          setCoverPreview(response.data.cover_image)
+        }
+        setAvatarFile(null)
+        setCoverFile(null)
+
+        if (onImageUpload) {
+          onImageUpload(response.data)
+        }
+
+        alert('Profile updated successfully!')
+      }
+    } catch (err) {
+      console.error('Profile update error:', err)
+      const errorMsg = err.response?.data?.message || err.message || 'Profile update failed'
+      setUploadError(errorMsg)
+      alert(`Error: ${errorMsg}`)
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -156,7 +169,7 @@ function ProfileCustomization({ profileData, handleChange, handleSubmit, onImage
         </div>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSaveChanges}>
         <div className="form-group">
           <label>Username</label>
           <input
