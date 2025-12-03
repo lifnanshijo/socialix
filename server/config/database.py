@@ -54,7 +54,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS posts (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
-            content TEXT NOT NULL,
+            content TEXT,
             image_data LONGBLOB,
             image_type VARCHAR(50),
             video_data LONGBLOB,

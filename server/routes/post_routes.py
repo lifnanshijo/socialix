@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity
 from models.post import Post
 from models.user import User
+from models.interactions import Like, Comment
 from middleware.auth import token_required
 import mimetypes
 
@@ -266,5 +267,141 @@ def delete_post(post_id):
         Post.delete(post_id)
         
         return jsonify({'message': 'Post deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+# Like endpoints
+@post_bp.route('/<int:post_id>/like', methods=['POST'])
+@token_required
+def like_post(post_id):
+    """Like a post"""
+    try:
+        user_id = get_jwt_identity()
+        user_id = int(user_id) if isinstance(user_id, str) else user_id
+        
+        # Check if post exists
+        post = Post.find_by_id(post_id)
+        if not post:
+            return jsonify({'message': 'Post not found'}), 404
+        
+        # Add like
+        success = Like.add_like(user_id, post_id)
+        if not success:
+            return jsonify({'message': 'Already liked'}), 400
+        
+        like_count = Like.get_like_count(post_id)
+        
+        return jsonify({
+            'message': 'Post liked',
+            'likeCount': like_count,
+            'isLiked': True
+        }), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+@post_bp.route('/<int:post_id>/unlike', methods=['POST'])
+@token_required
+def unlike_post(post_id):
+    """Unlike a post"""
+    try:
+        user_id = get_jwt_identity()
+        user_id = int(user_id) if isinstance(user_id, str) else user_id
+        
+        # Remove like
+        Like.remove_like(user_id, post_id)
+        like_count = Like.get_like_count(post_id)
+        
+        return jsonify({
+            'message': 'Post unliked',
+            'likeCount': like_count,
+            'isLiked': False
+        }), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+@post_bp.route('/<int:post_id>/likes', methods=['GET'])
+def get_post_likes(post_id):
+    """Get all likes for a post"""
+    try:
+        likes = Like.get_post_likes(post_id)
+        like_count = Like.get_like_count(post_id)
+        
+        return jsonify({
+            'count': like_count,
+            'likes': likes
+        }), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+# Comment endpoints
+@post_bp.route('/<int:post_id>/comments', methods=['POST'])
+@token_required
+def add_comment(post_id):
+    """Add a comment to a post"""
+    try:
+        user_id = get_jwt_identity()
+        user_id = int(user_id) if isinstance(user_id, str) else user_id
+        
+        data = request.get_json()
+        content = data.get('content', '').strip()
+        
+        if not content:
+            return jsonify({'message': 'Comment content is required'}), 400
+        
+        # Check if post exists
+        post = Post.find_by_id(post_id)
+        if not post:
+            return jsonify({'message': 'Post not found'}), 404
+        
+        # Create comment
+        comment = Comment.create(user_id, post_id, content)
+        
+        if not comment:
+            return jsonify({'message': 'Failed to create comment'}), 500
+        
+        return jsonify(Comment.to_dict(comment)), 201
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+@post_bp.route('/<int:post_id>/comments', methods=['GET'])
+def get_post_comments(post_id):
+    """Get all comments for a post"""
+    try:
+        comments = Comment.find_by_post(post_id)
+        comment_count = Comment.get_comment_count(post_id)
+        
+        return jsonify({
+            'count': comment_count,
+            'comments': [Comment.to_dict(comment) for comment in comments]
+        }), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+
+
+@post_bp.route('/comments/<int:comment_id>', methods=['DELETE'])
+@token_required
+def delete_comment(comment_id):
+    """Delete a comment"""
+    try:
+        user_id = get_jwt_identity()
+        user_id = int(user_id) if isinstance(user_id, str) else user_id
+        
+        # Check if comment exists
+        comment = Comment.find_by_id(comment_id)
+        if not comment:
+            return jsonify({'message': 'Comment not found'}), 404
+        
+        # Check if user owns the comment
+        if comment['user_id'] != user_id:
+            return jsonify({'message': 'Unauthorized'}), 403
+        
+        Comment.delete(comment_id, user_id)
+        
+        return jsonify({'message': 'Comment deleted successfully'}), 200
     except Exception as e:
         return jsonify({'message': str(e)}), 500
