@@ -5,7 +5,7 @@ const API_URL = 'http://localhost:5000'
 
 function ProfileCustomization({ profileData, handleChange, handleSubmit, onImageUpload = null }) {
   const [avatarPreview, setAvatarPreview] = useState(profileData.avatar || '')
-  const [coverPreview, setCoverPreview] = useState(profileData.coverImage || '')
+  const [coverPreview, setCoverPreview] = useState(profileData.cover_image || '')
   const [avatarFile, setAvatarFile] = useState(null)
   const [coverFile, setCoverFile] = useState(null)
   const [uploading, setUploading] = useState(false)

@@ -93,23 +93,37 @@ class User:
         # Convert BLOB images to base64 for JSON serialization
         avatar_data = None
         if user.get('avatar'):
-            avatar_type = user.get('avatar_type', 'image/jpeg')
+            avatar_type = user.get('avatar_type') or 'image/jpeg'
             avatar_bytes = user.get('avatar')
-            if isinstance(avatar_bytes, bytes):
-                avatar_b64 = base64.b64encode(avatar_bytes).decode('utf-8')
-                avatar_data = f"data:{avatar_type};base64,{avatar_b64}"
-            else:
-                avatar_data = avatar_bytes
+            if avatar_bytes:
+                try:
+                    if isinstance(avatar_bytes, bytes):
+                        avatar_b64 = base64.b64encode(avatar_bytes).decode('utf-8')
+                        avatar_data = f"data:{avatar_type};base64,{avatar_b64}"
+                    elif isinstance(avatar_bytes, str) and avatar_bytes.startswith('data:'):
+                        avatar_data = avatar_bytes
+                    else:
+                        avatar_data = None
+                except Exception as e:
+                    print(f"Error encoding avatar: {e}")
+                    avatar_data = None
         
         cover_image_data = None
         if user.get('cover_image'):
-            cover_type = user.get('cover_image_type', 'image/jpeg')
+            cover_type = user.get('cover_image_type') or 'image/jpeg'
             cover_bytes = user.get('cover_image')
-            if isinstance(cover_bytes, bytes):
-                cover_b64 = base64.b64encode(cover_bytes).decode('utf-8')
-                cover_image_data = f"data:{cover_type};base64,{cover_b64}"
-            else:
-                cover_image_data = cover_bytes
+            if cover_bytes:
+                try:
+                    if isinstance(cover_bytes, bytes):
+                        cover_b64 = base64.b64encode(cover_bytes).decode('utf-8')
+                        cover_image_data = f"data:{cover_type};base64,{cover_b64}"
+                    elif isinstance(cover_bytes, str) and cover_bytes.startswith('data:'):
+                        cover_image_data = cover_bytes
+                    else:
+                        cover_image_data = None
+                except Exception as e:
+                    print(f"Error encoding cover_image: {e}")
+                    cover_image_data = None
         
         return {
             'id': user['id'],
@@ -117,6 +131,9 @@ class User:
             'email': user['email'],
             'bio': user.get('bio'),
             'avatar': avatar_data,
-            'coverImage': cover_image_data,
-            'createdAt': user['created_at'].isoformat() if isinstance(user['created_at'], datetime) else user['created_at']
+            'cover_image': cover_image_data,
+            'avatar_type': user.get('avatar_type'),
+            'cover_image_type': user.get('cover_image_type'),
+            'created_at': user['created_at'].isoformat() if isinstance(user['created_at'], datetime) else user['created_at'],
+            'updated_at': user.get('updated_at').isoformat() if isinstance(user.get('updated_at'), datetime) else user.get('updated_at')
         }
