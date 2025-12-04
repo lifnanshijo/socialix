@@ -10,7 +10,7 @@ function Profile() {
     username: '',
     bio: '',
     avatar: '',
-    coverImage: ''
+    cover_image: ''
   })
 
   useEffect(() => {
@@ -19,7 +19,7 @@ function Profile() {
         username: user.username || '',
         bio: user.bio || '',
         avatar: user.avatar || '',
-        coverImage: user.cover_image || ''
+        cover_image: user.cover_image || ''
       })
     }
   }, [user])
@@ -36,7 +36,7 @@ function Profile() {
     setProfileData({
       ...profileData,
       avatar: updatedUser.avatar || profileData.avatar,
-      coverImage: updatedUser.cover_image || profileData.coverImage
+      cover_image: updatedUser.cover_image || profileData.cover_image
     })
     setIsEditing(false)
   }
@@ -45,7 +45,7 @@ function Profile() {
     <div className="profile-container">
       <div className="profile-header">
         <div className="cover-image" style={{ 
-          backgroundImage: `url(${profileData.coverImage || 'https://via.placeholder.com/1200x300'})` 
+          backgroundImage: `url(${profileData.cover_image || 'https://via.placeholder.com/1200x300'})` 
         }}>
         </div>
         <div className="profile-info">
