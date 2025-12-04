@@ -32,12 +32,37 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get(`${API_URL}/api/auth/me`)
       setUser(response.data)
     } catch (err) {
+      console.error('Failed to fetch user:', err)
+      // Token is invalid or expired, clear it
       localStorage.removeItem('token')
       delete axios.defaults.headers.common['Authorization']
+      setUser(null)
     } finally {
       setLoading(false)
     }
   }
+
+  // Add axios interceptor to handle 401 errors globally
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          console.log('Token expired or invalid, logging out')
+          localStorage.removeItem('token')
+          delete axios.defaults.headers.common['Authorization']
+          setUser(null)
+          // Optionally redirect to login
+          window.location.href = '/login'
+        }
+        return Promise.reject(error)
+      }
+    )
+
+    return () => {
+      axios.interceptors.response.eject(interceptor)
+    }
+  }, [])
 
   const login = async (email, password) => {
     const response = await axios.post(`${API_URL}/api/auth/login`, { email, password })

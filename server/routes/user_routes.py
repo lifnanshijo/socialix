@@ -120,7 +120,8 @@ def update_profile():
         return jsonify({'message': str(e)}), 500
 
 @user_bp.route('/<int:user_id>', methods=['GET'])
-def get_user(user_id):
+@token_required
+def get_user(current_user, user_id):
     """Get user by ID"""
     try:
         user = User.find_by_id(user_id)

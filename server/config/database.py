@@ -12,7 +12,7 @@ def get_db_connection():
             host=os.getenv('DB_HOST', 'localhost'),
             user=os.getenv('DB_USER', 'root'),
             password=os.getenv('DB_PASSWORD', ''),
-            database=os.getenv('DB_NAME', 'social_connect')
+            database=os.getenv('DB_NAME', 'socialmedia')
         )
         return connection
     except Error as e:
@@ -94,6 +94,50 @@ def init_db():
         )
     """)
 
+    # Create conversations table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS conversations (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user1_id INT NOT NULL,
+            user2_id INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_user1 (user1_id),
+            INDEX idx_user2 (user2_id)
+        )
+    """)
+
+    # Create messages table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS messages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            conversation_id INT NOT NULL,
+            sender_id INT NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
+            FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_conversation (conversation_id)
+        )
+    """)
+
+    # Create followers table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS followers (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            follower_id INT NOT NULL,
+            following_id INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (following_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE KEY unique_follow (follower_id, following_id),
+            INDEX idx_follower (follower_id),
+            INDEX idx_following (following_id)
+        )
+    """)
+
     connection.commit()
     cursor.close()
     connection.close()
@@ -116,7 +160,8 @@ def execute_query(query, params=None, fetch=False):
             return cursor.lastrowid
     except Error as e:
         print(f"Database error: {e}")
-        return None
+        connection.rollback()
+        raise e
     finally:
         cursor.close()
         connection.close()

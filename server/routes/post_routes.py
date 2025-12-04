@@ -164,16 +164,22 @@ def get_user_posts(user_id):
 
 @post_bp.route('/feed', methods=['GET'])
 def get_feed():
-    """Get feed of all posts"""
+    """Get feed of all posts or posts by specific user"""
     try:
         page = request.args.get('page', 1, type=int)
+        user_id = request.args.get('user_id', type=int)
         limit = 20
         offset = (page - 1) * limit
         
-        posts = Post.get_feed(limit, offset)
+        if user_id:
+            # Get posts by specific user
+            posts = Post.get_user_posts(user_id, limit, offset)
+        else:
+            # Get all posts
+            posts = Post.get_feed(limit, offset)
         
         if not posts:
-            return jsonify([]), 200
+            return jsonify({'posts': []}), 200
         
         posts_data = []
         for post in posts:
@@ -182,7 +188,7 @@ def get_feed():
             post_data['user'] = User.to_dict(user) if user else None
             posts_data.append(post_data)
         
-        return jsonify(posts_data), 200
+        return jsonify({'posts': posts_data}), 200
     except Exception as e:
         return jsonify({'message': str(e)}), 500
 

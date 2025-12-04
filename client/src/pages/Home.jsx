@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import '../styles/home.css'
 
 function Home() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [posts, setPosts] = useState([])
   const [content, setContent] = useState('')
   const [imageFile, setImageFile] = useState(null)
@@ -16,6 +18,15 @@ function Home() {
   const [postLikes, setPostLikes] = useState({})
   const [postComments, setPostComments] = useState({})
 
+  const goToProfile = (userId) => {
+    if (userId) {
+      console.log('Navigating to profile:', userId);
+      navigate(`/profile/${userId}`);
+    } else {
+      console.error('Cannot navigate: userId is undefined');
+    }
+  };
+
   useEffect(() => {
     fetchPosts()
   }, [])
@@ -23,10 +34,11 @@ function Home() {
   const fetchPosts = async () => {
     try {
       const response = await axios.get('/api/posts/feed')
-      setPosts(response.data)
+      const postsData = response.data.posts || response.data || []
+      setPosts(postsData)
       
       // Fetch likes and comments for each post
-      response.data.forEach(post => {
+      postsData.forEach(post => {
         fetchPostLikes(post.id)
         fetchPostComments(post.id)
       })
@@ -277,9 +289,17 @@ function Home() {
                   <img 
                     src={post.user?.avatar || 'https://via.placeholder.com/50'} 
                     alt="avatar" 
+                    className="post-avatar"
+                    onClick={() => goToProfile(post.userId)}
+                    style={{ cursor: 'pointer' }}
                   />
                   <div className="post-user-info">
-                    <h4>{post.user?.username || 'Unknown User'}</h4>
+                    <h4 
+                      onClick={() => goToProfile(post.userId)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {post.user?.username || 'Unknown User'}
+                    </h4>
                     <span>{formatDate(post.createdAt)}</span>
                   </div>
                   {post.userId === user?.id && (
@@ -358,11 +378,18 @@ function Home() {
                         <div key={comment.id} className="comment-item">
                           <img 
                             src={comment.avatar || 'https://via.placeholder.com/40'} 
-                            alt="avatar" 
+                            alt="avatar"
+                            onClick={() => goToProfile(comment.userId)}
+                            style={{ cursor: 'pointer' }}
                           />
                           <div className="comment-content">
                             <div className="comment-header">
-                              <strong>{comment.username}</strong>
+                              <strong 
+                                onClick={() => goToProfile(comment.userId)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                {comment.username}
+                              </strong>
                               <span>{formatDate(comment.createdAt)}</span>
                             </div>
                             <p>{comment.content}</p>

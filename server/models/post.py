@@ -31,6 +31,18 @@ class Post:
         """
         result = execute_query(query, (user_id, limit, offset), fetch=True)
         return result if result else []
+    
+    @staticmethod
+    def get_user_posts(user_id, limit=20, offset=0):
+        """Get posts by specific user"""
+        query = """
+            SELECT * FROM posts 
+            WHERE user_id = %s
+            ORDER BY created_at DESC 
+            LIMIT %s OFFSET %s
+        """
+        result = execute_query(query, (user_id, limit, offset), fetch=True)
+        return result if result else []
 
     @staticmethod
     def get_feed(limit=20, offset=0):

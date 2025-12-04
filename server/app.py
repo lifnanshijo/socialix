@@ -5,6 +5,8 @@ from config.database import init_db
 from routes.auth_routes import auth_bp
 from routes.user_routes import user_bp
 from routes.post_routes import post_bp
+from routes.chat_routes import chat_bp
+from routes.follow_routes import follow_bp
 import os
 from dotenv import load_dotenv
 
@@ -28,6 +30,8 @@ init_db()
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api/users')
 app.register_blueprint(post_bp, url_prefix='/api/posts')
+app.register_blueprint(chat_bp, url_prefix='/api/chat')
+app.register_blueprint(follow_bp, url_prefix='/api/users')
 
 @app.route('/')
 def home():

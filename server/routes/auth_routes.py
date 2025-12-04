@@ -51,18 +51,29 @@ def login():
         email = data.get('email')
         password = data.get('password')
 
+        print(f"Login attempt for email: {email}")  # Debug log
+
         if not email or not password:
+            print("Missing email or password")
             return jsonify({'message': 'Missing email or password'}), 400
 
         # Find user
         user = User.find_by_email(email)
-        if not user or not user.get('password'):
+        if not user:
+            print(f"User not found: {email}")
+            return jsonify({'message': 'Invalid credentials'}), 401
+        
+        if not user.get('password'):
+            print(f"User has no password (OAuth user?): {email}")
             return jsonify({'message': 'Invalid credentials'}), 401
 
         # Verify password
         if not User.verify_password(password, user['password']):
+            print(f"Password verification failed for: {email}")
             return jsonify({'message': 'Invalid credentials'}), 401
 
+        print(f"Login successful for: {email}")
+        
         # Generate token
         access_token = create_access_token(identity=str(user['id']))
 
@@ -72,6 +83,9 @@ def login():
         }), 200
 
     except Exception as e:
+        print(f"Login error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'message': str(e)}), 500
 
 @auth_bp.route('/google', methods=['POST'])

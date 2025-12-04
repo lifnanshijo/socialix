@@ -28,6 +28,8 @@ function Navbar() {
 
           {user ? (
             <>
+              <Link to="/home" className="btn">Home</Link>
+              <Link to="/chat" className="btn">Messages</Link>
               <Link to="/profile" className="btn">Profile</Link>
               <button onClick={handleLogout} className="btn">Logout</button>
             </>
