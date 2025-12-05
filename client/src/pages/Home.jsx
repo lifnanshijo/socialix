@@ -37,13 +37,15 @@ function Home() {
       const postsData = response.data.posts || response.data || []
       setPosts(postsData)
       
-      // Fetch likes and comments for each post
-      postsData.forEach(post => {
-        fetchPostLikes(post.id)
-        fetchPostComments(post.id)
-      })
+      // Pre-populate likes and comments for each post
+      const likesPromises = postsData.map(post => fetchPostLikes(post.id))
+      const commentsPromises = postsData.map(post => fetchPostComments(post.id))
+      
+      // Wait for all requests to complete
+      await Promise.all([...likesPromises, ...commentsPromises])
     } catch (err) {
       console.error('Failed to fetch posts:', err)
+      setError('Failed to load posts')
     }
   }
 
@@ -176,11 +178,13 @@ function Home() {
         formData.append('image', imageFile)
       }
 
-      await axios.post('/api/posts/create', formData, {
+      const response = await axios.post('/api/posts/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       })
+
+      console.log('Post created successfully:', response.data)
 
       // Clear form
       setContent('')
@@ -188,9 +192,11 @@ function Home() {
       setImagePreview(null)
       
       // Refresh posts
-      fetchPosts()
+      await fetchPosts()
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create post')
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to create post'
+      console.error('Error creating post:', err)
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -203,9 +209,10 @@ function Home() {
 
     try {
       await axios.delete(`/api/posts/${postId}`)
-      setPosts(posts.filter(post => post.id !== postId))
+      await fetchPosts()
     } catch (err) {
       console.error('Failed to delete post:', err)
+      setError('Failed to delete post')
     }
   }
 

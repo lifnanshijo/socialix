@@ -121,7 +121,7 @@ def update_profile():
 
 @user_bp.route('/<int:user_id>', methods=['GET'])
 @token_required
-def get_user(current_user, user_id):
+def get_user(user_id):
     """Get user by ID"""
     try:
         user = User.find_by_id(user_id)

@@ -98,34 +98,52 @@ class Post:
         if not post:
             return None
         
-        # Convert BLOB media to base64
-        image_url = None
-        if post.get('image_data'):
-            image_type = post.get('image_type', 'image/jpeg')
-            image_bytes = post.get('image_data')
-            if isinstance(image_bytes, bytes):
-                image_b64 = base64.b64encode(image_bytes).decode('utf-8')
-                image_url = f"data:{image_type};base64,{image_b64}"
-            else:
-                image_url = image_bytes
-        
-        video_url = None
-        if post.get('video_data'):
-            video_type = post.get('video_type', 'video/mp4')
-            video_bytes = post.get('video_data')
-            if isinstance(video_bytes, bytes):
-                video_b64 = base64.b64encode(video_bytes).decode('utf-8')
-                video_url = f"data:{video_type};base64,{video_b64}"
-            else:
-                video_url = video_bytes
-        
-        return {
-            'id': post['id'],
-            'userId': post['user_id'],
-            'content': post['content'],
-            'imageUrl': image_url,
-            'videoUrl': video_url,
-            'mediaType': post.get('media_type', 'text'),
-            'createdAt': post['created_at'].isoformat() if isinstance(post['created_at'], datetime) else post['created_at'],
-            'updatedAt': post['updated_at'].isoformat() if isinstance(post['updated_at'], datetime) else post['updated_at']
-        }
+        try:
+            # Handle both dict and object access patterns
+            def safe_get(obj, key, default=None):
+                if isinstance(obj, dict):
+                    return obj.get(key, default)
+                return getattr(obj, key, default)
+            
+            # Convert BLOB media to base64
+            image_url = None
+            image_data = safe_get(post, 'image_data')
+            if image_data:
+                image_type = safe_get(post, 'image_type', 'image/jpeg')
+                if isinstance(image_data, bytes):
+                    image_b64 = base64.b64encode(image_data).decode('utf-8')
+                    image_url = f"data:{image_type};base64,{image_b64}"
+                else:
+                    image_url = image_data
+            
+            video_url = None
+            video_data = safe_get(post, 'video_data')
+            if video_data:
+                video_type = safe_get(post, 'video_type', 'video/mp4')
+                if isinstance(video_data, bytes):
+                    video_b64 = base64.b64encode(video_data).decode('utf-8')
+                    video_url = f"data:{video_type};base64,{video_b64}"
+                else:
+                    video_url = video_data
+            
+            created_at = safe_get(post, 'created_at')
+            updated_at = safe_get(post, 'updated_at')
+            
+            if isinstance(created_at, datetime):
+                created_at = created_at.isoformat()
+            if isinstance(updated_at, datetime):
+                updated_at = updated_at.isoformat()
+            
+            return {
+                'id': safe_get(post, 'id'),
+                'userId': safe_get(post, 'user_id'),
+                'content': safe_get(post, 'content'),
+                'imageUrl': image_url,
+                'videoUrl': video_url,
+                'mediaType': safe_get(post, 'media_type', 'text'),
+                'createdAt': created_at,
+                'updatedAt': updated_at
+            }
+        except Exception as e:
+            print(f"Error converting post to dict: {e}")
+            raise

@@ -1,5 +1,6 @@
 from config.database import execute_query
 from datetime import datetime
+import base64
 
 class Like:
     @staticmethod
@@ -64,7 +65,7 @@ class Comment:
     def find_by_id(comment_id):
         """Find comment by ID"""
         query = """
-            SELECT c.*, u.username
+            SELECT c.*, u.username, u.avatar, u.avatar_type
             FROM comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.id = %s
@@ -76,7 +77,7 @@ class Comment:
     def find_by_post(post_id):
         """Get all comments for a post"""
         query = """
-            SELECT c.*, u.username
+            SELECT c.*, u.username, u.avatar, u.avatar_type
             FROM comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.post_id = %s
@@ -104,12 +105,27 @@ class Comment:
         if not comment:
             return None
         
+        # Get avatar URL
+        avatar_url = 'https://via.placeholder.com/40'
+        avatar = comment.get('avatar') if isinstance(comment, dict) else getattr(comment, 'avatar', None)
+        if avatar:
+            avatar_type = comment.get('avatar_type', 'image/jpeg') if isinstance(comment, dict) else getattr(comment, 'avatar_type', 'image/jpeg')
+            if isinstance(avatar, bytes):
+                avatar_b64 = base64.b64encode(avatar).decode('utf-8')
+                avatar_url = f"data:{avatar_type};base64,{avatar_b64}"
+            else:
+                avatar_url = avatar
+        
+        created_at = comment['created_at'] if isinstance(comment, dict) else getattr(comment, 'created_at')
+        if isinstance(created_at, datetime):
+            created_at = created_at.isoformat()
+        
         return {
-            'id': comment['id'],
-            'userId': comment['user_id'],
-            'postId': comment['post_id'],
-            'username': comment['username'],
-            'avatar': 'https://via.placeholder.com/40',
-            'content': comment['content'],
-            'createdAt': comment['created_at'].isoformat() if isinstance(comment['created_at'], datetime) else comment['created_at']
+            'id': comment['id'] if isinstance(comment, dict) else comment.id,
+            'userId': comment['user_id'] if isinstance(comment, dict) else comment.user_id,
+            'postId': comment['post_id'] if isinstance(comment, dict) else comment.post_id,
+            'username': comment['username'] if isinstance(comment, dict) else comment.username,
+            'avatar': avatar_url,
+            'content': comment['content'] if isinstance(comment, dict) else comment.content,
+            'createdAt': created_at
         }

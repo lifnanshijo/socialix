@@ -15,8 +15,8 @@ def token_required(f):
             if not user:
                 return jsonify({'message': 'User not found'}), 404
             
-            current_user = User.to_dict(user)
-            return f(current_user, *args, **kwargs)
+            # Just verify the token is valid, don't pass user as parameter
+            return f(*args, **kwargs)
         except Exception as e:
             print(f"Auth Error: {str(e)}")
             return jsonify({'message': 'Token is invalid or expired'}), 401

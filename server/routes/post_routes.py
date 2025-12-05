@@ -113,10 +113,17 @@ def create_post():
         if not post:
             return jsonify({'message': 'Failed to create post'}), 500
         
-        return jsonify(Post.to_dict(post)), 201
+        # Get user information
+        user = User.find_by_id(user_id)
+        post_data = Post.to_dict(post)
+        post_data['user'] = User.to_dict(user) if user else None
+        
+        return jsonify(post_data), 201
     except ValueError as e:
+        print(f"Validation error in create_post: {e}")
         return jsonify({'message': str(e)}), 400
     except Exception as e:
+        print(f"Error in create_post: {e}")
         return jsonify({'message': str(e)}), 500
 
 @post_bp.route('/<int:post_id>', methods=['GET'])
