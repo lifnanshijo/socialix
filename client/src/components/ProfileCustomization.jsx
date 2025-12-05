@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import { useAuth } from '../context/AuthContext'
 
 const API_URL = 'http://localhost:5000'
 
 function ProfileCustomization({ profileData, handleChange, handleSubmit, onImageUpload = null }) {
+  const { updateProfile: contextUpdateProfile } = useAuth()
   const [avatarPreview, setAvatarPreview] = useState(profileData.avatar || '')
   const [coverPreview, setCoverPreview] = useState(profileData.cover_image || '')
   const [avatarFile, setAvatarFile] = useState(null)
@@ -41,53 +43,42 @@ function ProfileCustomization({ profileData, handleChange, handleSubmit, onImage
     setUploadError('')
 
     try {
-      const token = localStorage.getItem('token')
-      const formData = new FormData()
+      const files = {}
+      if (avatarFile) files.avatarFile = avatarFile
+      if (coverFile) files.coverFile = coverFile
 
-      // Add profile data
-      formData.append('username', profileData.username)
-      formData.append('bio', profileData.bio)
-
-      // Add files if selected
-      if (avatarFile) {
-        formData.append('avatar', avatarFile)
-      }
-      if (coverFile) {
-        formData.append('cover_image', coverFile)
+      const updateData = {
+        username: profileData.username,
+        bio: profileData.bio
       }
 
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      }
+      console.log('Updating profile with:', { updateData, files })
 
-      console.log('Sending update to:', `${API_URL}/api/users/profile`)
-      const response = await axios.put(`${API_URL}/api/users/profile`, formData, config)
+      // Use context method to update profile - this updates global user state
+      const response = await contextUpdateProfile(updateData, files)
 
-      console.log('Profile update response:', response.data)
+      console.log('Profile update response:', response)
 
-      if (response.data) {
+      if (response) {
         // Update previews and clear file inputs
-        if (response.data.avatar) {
-          setAvatarPreview(response.data.avatar)
+        if (response.avatar) {
+          setAvatarPreview(response.avatar)
         }
-        if (response.data.cover_image) {
-          setCoverPreview(response.data.cover_image)
+        if (response.cover_image) {
+          setCoverPreview(response.cover_image)
         }
         setAvatarFile(null)
         setCoverFile(null)
 
         if (onImageUpload) {
-          onImageUpload(response.data)
+          onImageUpload(response)
         }
 
         alert('Profile updated successfully!')
       }
     } catch (err) {
       console.error('Profile update error:', err)
-      const errorMsg = err.response?.data?.message || err.message || 'Profile update failed'
+      const errorMsg = err.message || 'Profile update failed'
       setUploadError(errorMsg)
       alert(`Error: ${errorMsg}`)
     } finally {

@@ -32,9 +32,10 @@ function Profile() {
   }
 
   const handleImageUpload = (updatedUser) => {
-    // Update local state with new image URLs
+    // Update local state with new image URLs from the updated user
     setProfileData({
-      ...profileData,
+      username: updatedUser.username || profileData.username,
+      bio: updatedUser.bio || profileData.bio,
       avatar: updatedUser.avatar || profileData.avatar,
       cover_image: updatedUser.cover_image || profileData.cover_image
     })
