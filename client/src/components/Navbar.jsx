@@ -60,21 +60,6 @@ function Navbar() {
           >
             {mobileMenuOpen ? '✕' : '☰'}
           </button>
-
-          {user ? (
-            <>
-              <Link to="/home" className="btn">🏠 Home</Link>
-              <Link to="/search" className="btn">🔍 Search</Link>
-              <Link to="/chat" className="btn">💬 Messages</Link>
-              <Link to="/profile" className="btn">👤 Profile</Link>
-              <button onClick={handleLogout} className="btn">Logout</button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="btn">Login</Link>
-              <Link to="/signup" className="btn btn-primary">Sign Up</Link>
-            </>
-          )}
         </div>
       </nav>
 
