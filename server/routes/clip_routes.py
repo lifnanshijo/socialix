@@ -92,16 +92,22 @@ def upload_clip():
         if file_size_mb > 100:
             return jsonify({'error': 'File size exceeds 100MB limit'}), 413
 
-        # Save file with secure filename
-        filename = secure_filename(f"{current_user_id}_{datetime.now().timestamp()}_{file.filename}")
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(file_path)
+        # Read file data into memory
+        file_data = file.read()
+        file_size_bytes = len(file_data)
 
-        # Create file URL (adjust based on your hosting setup)
-        file_url = f"/uploads/clips/{filename}"
+        # Get MIME type
+        file_type = file.content_type or 'application/octet-stream'
 
-        # Save clip metadata to database
-        clip_data = Clip.create_clip(current_user_id, file_url, caption)
+        # Create clip in database with binary data
+        clip_data = Clip.create_clip(
+            current_user_id,
+            file_data,
+            file.filename,
+            file_type,
+            file_size_bytes,
+            caption
+        )
 
         if not clip_data:
             logger.error(f"Failed to save clip metadata for user_id={current_user_id}")
@@ -142,6 +148,42 @@ def get_user_clips(user_id):
     except Exception as e:
         logger.error(f"Error retrieving user clips: {str(e)}")
         return jsonify({'error': 'Failed to retrieve clips'}), 500
+
+
+@clips_bp.route('/<int:clip_id>/download', methods=['GET'])
+@jwt_required()
+def download_clip(clip_id):
+    """
+    Download/retrieve clip file data from database
+
+    GET /api/clips/<clip_id>/download
+
+    Returns:
+        bytes: File data with appropriate content-type header
+    """
+    try:
+        current_user_id = get_jwt_identity()
+        clip = Clip.get_clip_by_id(clip_id)
+
+        if not clip:
+            logger.warning(f"Download attempt for non-existent clip_id={clip_id}")
+            return jsonify({'error': 'Clip not found'}), 404
+
+        # Return file data with appropriate headers
+        from flask import send_file
+        from io import BytesIO
+
+        file_stream = BytesIO(clip['file_data'])
+        return send_file(
+            file_stream,
+            mimetype=clip['file_type'],
+            as_attachment=True,
+            download_name=clip['file_name']
+        )
+
+    except Exception as e:
+        logger.error(f"Error downloading clip: {str(e)}")
+        return jsonify({'error': 'Failed to download clip'}), 500
 
 
 @clips_bp.route('/all', methods=['GET'])

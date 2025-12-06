@@ -14,13 +14,16 @@ class Clip:
     """Clip model for handling clip operations in database"""
 
     @staticmethod
-    def create_clip(user_id, file_url, caption=None):
+    def create_clip(user_id, file_data, file_name, file_type, file_size, caption=None):
         """
-        Create a new clip in the database
+        Create a new clip in the database with binary file data
 
         Args:
             user_id (int): ID of the user uploading the clip
-            file_url (str): URL/path to the clip file
+            file_data (bytes): Binary file data
+            file_name (str): Original filename
+            file_type (str): MIME type (e.g., 'image/jpeg', 'video/mp4')
+            file_size (int): File size in bytes
             caption (str, optional): Caption for the clip
 
         Returns:
@@ -35,11 +38,11 @@ class Clip:
             expires_at = created_at + timedelta(hours=24)
 
             query = """
-                INSERT INTO clips (user_id, file_url, caption, created_at, expires_at)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO clips (user_id, file_data, file_name, file_type, file_size, caption, created_at, expires_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """
 
-            cursor.execute(query, (user_id, file_url, caption, created_at, expires_at))
+            cursor.execute(query, (user_id, file_data, file_name, file_type, file_size, caption, created_at, expires_at))
             conn.commit()
 
             clip_id = cursor.lastrowid
@@ -49,7 +52,9 @@ class Clip:
             return {
                 'clip_id': clip_id,
                 'user_id': user_id,
-                'file_url': file_url,
+                'file_name': file_name,
+                'file_type': file_type,
+                'file_size': file_size,
                 'caption': caption,
                 'created_at': created_at.isoformat(),
                 'expires_at': expires_at.isoformat()
@@ -78,9 +83,9 @@ class Clip:
             cursor = conn.cursor()
 
             query = """
-                SELECT clip_id, user_id, file_url, caption, created_at, expires_at
+                SELECT clip_id, user_id, file_name, file_type, file_size, caption, created_at, expires_at
                 FROM clips
-                WHERE user_id = %s AND expires_at > NOW()
+                WHERE user_id = %s AND expires_at > NOW() AND is_deleted = FALSE
                 ORDER BY created_at DESC
             """
 
@@ -92,10 +97,12 @@ class Clip:
                 result.append({
                     'clip_id': clip[0],
                     'user_id': clip[1],
-                    'file_url': clip[2],
-                    'caption': clip[3],
-                    'created_at': clip[4].isoformat(),
-                    'expires_at': clip[5].isoformat()
+                    'file_name': clip[2],
+                    'file_type': clip[3],
+                    'file_size': clip[4],
+                    'caption': clip[5],
+                    'created_at': clip[6].isoformat(),
+                    'expires_at': clip[7].isoformat()
                 })
 
             logger.info(f"Retrieved {len(result)} active clips for user_id={user_id}")
@@ -231,22 +238,22 @@ class Clip:
     @staticmethod
     def get_clip_by_id(clip_id):
         """
-        Get a specific clip by its ID
+        Get a specific clip by its ID with binary data
 
         Args:
             clip_id (int): ID of the clip
 
         Returns:
-            dict: Clip data if found, None otherwise
+            dict: Clip data including file_data if found, None otherwise
         """
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
 
             query = """
-                SELECT clip_id, user_id, file_url, caption, created_at, expires_at
+                SELECT clip_id, user_id, file_data, file_name, file_type, file_size, caption, created_at, expires_at
                 FROM clips
-                WHERE clip_id = %s AND expires_at > NOW()
+                WHERE clip_id = %s AND expires_at > NOW() AND is_deleted = FALSE
             """
 
             cursor.execute(query, (clip_id,))
@@ -258,10 +265,13 @@ class Clip:
             return {
                 'clip_id': clip[0],
                 'user_id': clip[1],
-                'file_url': clip[2],
-                'caption': clip[3],
-                'created_at': clip[4].isoformat(),
-                'expires_at': clip[5].isoformat()
+                'file_data': clip[2],
+                'file_name': clip[3],
+                'file_type': clip[4],
+                'file_size': clip[5],
+                'caption': clip[6],
+                'created_at': clip[7].isoformat(),
+                'expires_at': clip[8].isoformat()
             }
 
         except Exception as e:
