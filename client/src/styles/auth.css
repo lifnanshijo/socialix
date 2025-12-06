@@ -97,3 +97,89 @@
   background-color: #3a2c2c;
   color: #ff6b6b;
 }
+
+/* Mobile Responsive - Screens below 600px */
+@media (max-width: 600px) {
+  .auth-container {
+    min-height: calc(100vh - 60px);
+    padding: 12px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .auth-card {
+    max-width: 100%;
+    padding: 20px;
+    border-radius: 6px;
+  }
+
+  .auth-card h1 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .auth-card form {
+    gap: 8px;
+  }
+
+  .auth-card .btn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 14px;
+    min-height: 44px;
+  }
+
+  .divider {
+    font-size: 12px;
+    margin: 15px 0;
+  }
+
+  .divider::before,
+  .divider::after {
+    width: 30%;
+  }
+
+  .oauth-section {
+    gap: 8px;
+  }
+
+  .oauth-section .btn {
+    font-size: 13px;
+    padding: 8px 16px;
+    min-height: 40px;
+  }
+
+  .auth-switch {
+    margin-top: 15px;
+    font-size: 13px;
+  }
+
+  .error-message {
+    padding: 10px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  input {
+    padding: 10px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Tablet - Screens 601px to 900px */
+@media (max-width: 900px) and (min-width: 601px) {
+  .auth-card {
+    max-width: 100%;
+    padding: 30px;
+  }
+
+  .auth-card h1 {
+    font-size: 26px;
+  }
+
+  .auth-card .btn {
+    font-size: 15px;
+  }
+}
+

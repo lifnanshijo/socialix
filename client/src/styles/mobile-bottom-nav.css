@@ -1,0 +1,93 @@
+/* Mobile Bottom Navigation Styles */
+
+@media (max-width: 600px) {
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card-light);
+    border-top: 1px solid var(--border-light);
+    z-index: 999;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark-theme .mobile-bottom-nav {
+    background: var(--card-dark);
+    border-top-color: var(--border-dark);
+  }
+
+  .bottom-nav-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 56px;
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 6px 8px;
+    text-decoration: none;
+    color: #65676b;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 56px;
+    gap: 2px;
+    outline: none;
+  }
+
+  .bottom-nav-item:active,
+  .bottom-nav-item:focus {
+    outline: none;
+  }
+
+  .bottom-nav-item:hover {
+    color: var(--primary-color);
+    background: rgba(24, 119, 242, 0.05);
+  }
+
+  .bottom-nav-item.active {
+    color: var(--primary-color);
+    background: rgba(24, 119, 242, 0.1);
+  }
+
+  .dark-theme .bottom-nav-item.active {
+    background: rgba(24, 119, 242, 0.15);
+  }
+
+  .bottom-nav-item .icon {
+    font-size: 24px;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .bottom-nav-item .label {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  /* Ensure body has padding for bottom nav */
+  body {
+    padding-bottom: 56px;
+  }
+}
+
+/* Hide on desktop */
+@media (min-width: 601px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+
+  body {
+    padding-bottom: 0 !important;
+  }
+}

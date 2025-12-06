@@ -287,3 +287,179 @@
   margin: 20px 0;
   font-weight: 500;
 }
+
+/* Mobile Responsive - Screens below 600px */
+@media (max-width: 600px) {
+  .profile-container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .profile-header {
+    margin-bottom: 15px;
+    border-radius: 0;
+  }
+
+  .cover-image {
+    height: 150px;
+    border-radius: 0;
+  }
+
+  .profile-info {
+    padding: 0 15px 15px;
+    border-radius: 0;
+    margin-bottom: 12px;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+    margin-top: -50px;
+    border-width: 3px;
+  }
+
+  .user-details {
+    margin-top: 15px;
+  }
+
+  .user-details h1 {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .bio {
+    font-size: 14px;
+  }
+
+  .edit-btn {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-top: 12px;
+    width: 100%;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .profile-edit {
+    margin-bottom: 15px;
+    padding: 12px;
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .profile-edit h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .profile-content {
+    padding: 12px;
+    margin: 12px;
+    border-radius: 6px;
+  }
+
+  .profile-content h2 {
+    font-size: 18px;
+  }
+
+  .about-section {
+    margin-top: 12px;
+  }
+
+  .about-section p {
+    margin: 8px 0;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .image-upload-zone {
+    padding: 15px;
+    min-height: 120px;
+    border-radius: 6px;
+  }
+
+  .image-upload-zone.cover-zone {
+    min-height: 150px;
+  }
+
+  .upload-placeholder {
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .upload-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .avatar-preview {
+    width: 150px;
+    height: 150px;
+  }
+
+  .cover-preview {
+    width: 100%;
+    min-height: 150px;
+  }
+
+  .change-btn {
+    padding: 7px 14px;
+    font-size: 13px;
+    min-height: 36px;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="url"],
+  .form-group textarea {
+    padding: 10px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: 4px;
+  }
+
+  .error-message {
+    padding: 10px 12px;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+}
+
+/* Tablet - Screens 601px to 900px */
+@media (max-width: 900px) and (min-width: 601px) {
+  .profile-container {
+    max-width: 95%;
+  }
+
+  .cover-image {
+    height: 200px;
+  }
+
+  .avatar {
+    width: 120px;
+    height: 120px;
+    margin-top: -60px;
+  }
+
+  .user-details h1 {
+    font-size: 28px;
+  }
+
+  .profile-edit {
+    margin-bottom: 25px;
+  }
+
+  .edit-btn {
+    right: 15px;
+    top: 15px;
+  }
+}
+

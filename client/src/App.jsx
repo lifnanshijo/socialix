@@ -11,6 +11,7 @@ import Chat from './pages/Chat'
 import UserProfile from './pages/UserProfile'
 import PrivateRoute from './components/PrivateRoute'
 import Navbar from './components/Navbar'
+import MobileBottomNav from './components/MobileBottomNav'
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
@@ -47,6 +48,7 @@ function App() {
                 } />
                 <Route path="/" element={<Navigate to="/home" replace />} />
               </Routes>
+              <MobileBottomNav />
             </div>
           </AuthProvider>
         </ThemeProvider>

@@ -125,3 +125,82 @@ input:focus, textarea:focus {
   outline: none;
   border-color: var(--primary-color);
 }
+
+/* Mobile Responsive Styles - Screens below 600px */
+@media (max-width: 600px) {
+  body {
+    font-size: 14px;
+  }
+
+  .card {
+    padding: 12px;
+    margin: 12px 0;
+    border-radius: 6px;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    min-height: 44px; /* Touch-friendly size */
+  }
+
+  input, textarea {
+    padding: 10px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    margin: 6px 0;
+    border-radius: 4px;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  h4 {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  /* Ensure flexbox containers stack properly */
+  .flex-row {
+    flex-direction: column;
+  }
+
+  /* Responsive grid */
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablet - Screens 601px to 900px */
+@media (max-width: 900px) and (min-width: 601px) {
+  .card {
+    padding: 15px;
+    margin: 15px 0;
+  }
+
+  .btn {
+    font-size: 15px;
+    padding: 9px 18px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+}
+

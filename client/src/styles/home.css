@@ -336,3 +336,226 @@
   font-size: 14px;
   padding: 20px;
 }
+
+/* Mobile Responsive - Screens below 600px */
+@media (max-width: 600px) {
+  .home-container {
+    max-width: 100%;
+    padding: 12px;
+  }
+
+  .welcome-section {
+    padding: 20px 12px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+  }
+
+  .welcome-section h1 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .create-post {
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 6px;
+  }
+
+  .create-post h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .create-post form {
+    gap: 12px;
+  }
+
+  .create-post textarea {
+    min-height: 80px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .image-preview {
+    max-width: 100%;
+  }
+
+  .remove-image {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+
+  .post-actions-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .image-upload-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+
+  .error-message {
+    padding: 10px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .no-posts {
+    padding: 30px 12px;
+    font-size: 14px;
+  }
+
+  .post-card {
+    margin-bottom: 12px;
+    padding: 0;
+  }
+
+  .post-header {
+    margin-bottom: 12px;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .post-header img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .post-user-info h4 {
+    font-size: 14px;
+  }
+
+  .post-user-info span {
+    font-size: 11px;
+  }
+
+  .delete-btn {
+    font-size: 18px;
+    padding: 4px 8px;
+  }
+
+  .post-content {
+    margin-bottom: 12px;
+    padding: 0 12px;
+  }
+
+  .post-content p {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+
+  .post-image {
+    margin-top: 8px;
+  }
+
+  .post-actions {
+    gap: 6px;
+    padding: 10px 12px;
+    border-top-width: 1px;
+  }
+
+  .post-actions .btn {
+    padding: 8px 6px;
+    font-size: 12px;
+    min-height: 40px;
+  }
+
+  /* Comments Section Mobile */
+  .comments-section {
+    margin-top: 10px;
+    padding: 12px;
+    border-top-width: 1px;
+  }
+
+  .add-comment {
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .add-comment input {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .add-comment .btn {
+    padding: 8px 14px;
+    font-size: 12px;
+    min-height: 36px;
+  }
+
+  .comments-list {
+    gap: 10px;
+  }
+
+  .comment-item {
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .comment-item img {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  .comment-content {
+    padding: 8px 10px;
+    border-radius: 16px;
+    font-size: 13px;
+  }
+
+  .comment-header {
+    margin-bottom: 3px;
+  }
+
+  .comment-header strong {
+    font-size: 13px;
+  }
+
+  .comment-header span {
+    font-size: 10px;
+  }
+
+  .comment-content p {
+    font-size: 13px;
+  }
+
+  .delete-comment-btn {
+    font-size: 14px;
+  }
+
+  .no-comments {
+    font-size: 13px;
+    padding: 15px;
+  }
+}
+
+/* Tablet - Screens 601px to 900px */
+@media (max-width: 900px) and (min-width: 601px) {
+  .home-container {
+    max-width: 95%;
+  }
+
+  .welcome-section {
+    padding: 30px;
+  }
+
+  .create-post {
+    margin-bottom: 20px;
+  }
+
+  .post-card {
+    margin-bottom: 15px;
+  }
+
+  .post-actions .btn {
+    font-size: 13px;
+  }
+}
+
