@@ -8,6 +8,7 @@ import Signup from './pages/Signup'
 import Profile from './pages/Profile'
 import Home from './pages/Home'
 import Chat from './pages/Chat'
+import Search from './pages/Search'
 import UserProfile from './pages/UserProfile'
 import PrivateRoute from './components/PrivateRoute'
 import Navbar from './components/Navbar'
@@ -44,6 +45,11 @@ function App() {
                 <Route path="/chat" element={
                   <PrivateRoute>
                     <Chat />
+                  </PrivateRoute>
+                } />
+                <Route path="/search" element={
+                  <PrivateRoute>
+                    <Search />
                   </PrivateRoute>
                 } />
                 <Route path="/" element={<Navigate to="/home" replace />} />
