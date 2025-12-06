@@ -134,26 +134,44 @@ def get_user(user_id):
         return jsonify({'message': str(e)}), 500
 
 @user_bp.route('/search', methods=['GET'])
+@token_required
 def search_users():
     """Search users by username"""
     try:
+        current_user_id = get_jwt_identity()
+        current_user_id = int(current_user_id) if isinstance(current_user_id, str) else current_user_id
+        
         query = request.args.get('q', '')
         
         if not query:
             return jsonify({'message': 'Search query is required'}), 400
         
+        print(f"Searching for users with query: {query}")
+        print(f"Current user ID: {current_user_id}")
+        
         # Simple search implementation (can be enhanced)
         from config.database import execute_query
         
         search_query = """
-            SELECT id, username, email, bio, avatar_type, cover_image_type, created_at, updated_at
+            SELECT id, username, email, bio, avatar, avatar_type, cover_image, cover_image_type, created_at, updated_at
             FROM users 
-            WHERE username LIKE %s 
+            WHERE username LIKE %s AND id != %s
             LIMIT 20
         """
-        users = execute_query(search_query, (f'%{query}%',), fetch=True)
+        users = execute_query(search_query, (f'%{query}%', current_user_id), fetch=True)
         
-        return jsonify([User.to_dict(user) for user in users]), 200
+        print(f"Found {len(users) if users else 0} users")
+        
+        if not users:
+            return jsonify([]), 200
+        
+        result = [User.to_dict(user) for user in users]
+        print(f"Returning {len(result)} user results")
+        
+        return jsonify(result), 200
     except Exception as e:
+        print(f"Search error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'message': str(e)}), 500
 
