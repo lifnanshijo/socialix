@@ -41,6 +41,7 @@ function Navbar() {
               <>
                 <Link to="/home" className="btn">Home</Link>
                 <Link to="/chat" className="btn">Messages</Link>
+                <Link to="/clips" className="btn">Stories</Link>
                 <Link to="/profile" className="btn">Profile</Link>
                 <button onClick={handleLogout} className="btn">Logout</button>
               </>
@@ -76,6 +77,9 @@ function Navbar() {
             </Link>
             <Link to="/chat" className="nav-item" onClick={handleNavClick}>
               💬 Messages
+            </Link>
+            <Link to="/clips" className="nav-item" onClick={handleNavClick}>
+              📸 Stories
             </Link>
             <Link to="/profile" className="nav-item" onClick={handleNavClick}>
               👤 Profile

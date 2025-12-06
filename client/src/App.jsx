@@ -9,6 +9,7 @@ import Profile from './pages/Profile'
 import Home from './pages/Home'
 import Chat from './pages/Chat'
 import Search from './pages/Search'
+import Clips from './pages/Clips'
 import UserProfile from './pages/UserProfile'
 import PrivateRoute from './components/PrivateRoute'
 import Navbar from './components/Navbar'
@@ -50,6 +51,11 @@ function App() {
                 <Route path="/search" element={
                   <PrivateRoute>
                     <Search />
+                  </PrivateRoute>
+                } />
+                <Route path="/clips" element={
+                  <PrivateRoute>
+                    <Clips />
                   </PrivateRoute>
                 } />
                 <Route path="/" element={<Navigate to="/home" replace />} />

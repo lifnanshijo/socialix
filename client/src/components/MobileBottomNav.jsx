@@ -16,6 +16,7 @@ function MobileBottomNav() {
   const navItems = [
     { path: '/home', label: 'Home', icon: '🏠' },
     { path: '/chat', label: 'Messages', icon: '💬' },
+    { path: '/clips', label: 'Stories', icon: '📸' },
     { path: '/profile', label: 'Profile', icon: '👤' },
   ]
 

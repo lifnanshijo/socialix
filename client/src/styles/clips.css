@@ -1,0 +1,353 @@
+/* Clips Container */
+.clips-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.clips-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.clips-header h1 {
+  font-size: 32px;
+  color: var(--primary-color, #000);
+  margin: 0;
+}
+
+/* Tabs */
+.clips-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tab {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  color: #000;
+}
+
+.tab.active {
+  color: var(--primary-color, #007bff);
+  border-bottom-color: var(--primary-color, #007bff);
+}
+
+/* Upload Form */
+.clip-upload-container {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.clip-upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.upload-input-group,
+.caption-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-input-label {
+  position: relative;
+}
+
+.file-input-label input[type="file"] {
+  display: none;
+}
+
+.file-label-text {
+  display: block;
+  padding: 15px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.file-input-label:hover .file-label-text {
+  border-color: var(--primary-color, #007bff);
+  background: rgba(0, 123, 255, 0.05);
+}
+
+.file-input-label input:disabled ~ .file-label-text {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+textarea {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.submit-button {
+  padding: 12px 24px;
+  background: var(--primary-color, #007bff);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: var(--primary-dark, #0056b3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Messages */
+.error-message,
+.success-message {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.error-message {
+  background: #fee;
+  color: #c00;
+  border-left: 4px solid #c00;
+}
+
+.success-message {
+  background: #efe;
+  color: #060;
+  border-left: 4px solid #060;
+}
+
+/* Clips Grid */
+.clips-container {
+  padding: 20px;
+}
+
+.clips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.clip-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.clip-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.clip-media {
+  width: 100%;
+  height: 300px;
+  background: #f0f0f0;
+  overflow: hidden;
+}
+
+.clip-media video,
+.clip-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.clip-info {
+  padding: 15px;
+}
+
+.clip-user {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--primary-color, #007bff);
+}
+
+.clip-caption {
+  margin: 8px 0;
+  color: #333;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+
+.clip-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #999;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.clip-meta small.expires {
+  color: #f00;
+}
+
+/* Actions */
+.clip-actions {
+  position: relative;
+}
+
+.options-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 8px 12px;
+  float: right;
+  margin: -8px -12px 0 0;
+}
+
+.clip-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.delete-button {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  color: #c00;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #fee;
+}
+
+/* Loading & Empty States */
+.clips-loading,
+.clips-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.clips-loading {
+  font-size: 16px;
+}
+
+.clips-empty p {
+  font-size: 18px;
+  margin: 0;
+}
+
+.clips-empty small {
+  display: block;
+  margin-top: 10px;
+  color: #999;
+}
+
+.clips-error {
+  padding: 20px;
+  background: #fee;
+  color: #c00;
+  border-radius: 8px;
+  margin: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .clips-page {
+    padding: 15px;
+  }
+
+  .clips-header h1 {
+    font-size: 24px;
+  }
+
+  .clips-tabs {
+    flex-wrap: wrap;
+  }
+
+  .clips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .clip-upload-container {
+    padding: 20px;
+  }
+
+  .clip-card {
+    border-radius: 8px;
+  }
+
+  .clip-media {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .clips-tabs {
+    gap: 5px;
+  }
+
+  .tab {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+
+  .clip-media {
+    height: 200px;
+  }
+
+  .clip-info {
+    padding: 12px;
+  }
+
+  .clip-caption {
+    font-size: 13px;
+  }
+}
