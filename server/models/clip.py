@@ -102,7 +102,8 @@ class Clip:
                     'file_size': clip[4],
                     'caption': clip[5],
                     'created_at': clip[6].isoformat(),
-                    'expires_at': clip[7].isoformat()
+                    'expires_at': clip[7].isoformat(),
+                    'file_url': f'/api/clips/{clip[0]}/download'
                 })
 
             logger.info(f"Retrieved {len(result)} active clips for user_id={user_id}")
@@ -131,11 +132,11 @@ class Clip:
             cursor = conn.cursor()
 
             query = """
-                SELECT c.clip_id, c.user_id, c.file_url, c.caption, c.created_at, c.expires_at, u.username
+                SELECT c.clip_id, c.user_id, c.file_name, c.file_type, c.file_size, c.caption, c.created_at, c.expires_at, u.username
                 FROM clips c
-                INNER JOIN follows f ON c.user_id = f.followed_user_id
+                INNER JOIN followers f ON c.user_id = f.following_id
                 INNER JOIN users u ON c.user_id = u.id
-                WHERE f.follower_user_id = %s AND c.expires_at > NOW()
+                WHERE f.follower_id = %s AND c.expires_at > NOW() AND c.is_deleted = FALSE
                 ORDER BY c.created_at DESC
             """
 
@@ -147,11 +148,14 @@ class Clip:
                 result.append({
                     'clip_id': clip[0],
                     'user_id': clip[1],
-                    'file_url': clip[2],
-                    'caption': clip[3],
-                    'created_at': clip[4].isoformat(),
-                    'expires_at': clip[5].isoformat(),
-                    'uploaded_by': clip[6]
+                    'file_name': clip[2],
+                    'file_type': clip[3],
+                    'file_size': clip[4],
+                    'caption': clip[5],
+                    'created_at': clip[6].isoformat(),
+                    'expires_at': clip[7].isoformat(),
+                    'uploaded_by': clip[8],
+                    'file_url': f'/api/clips/{clip[0]}/download'
                 })
 
             logger.info(f"Retrieved {len(result)} clips from followed users for user_id={user_id}")

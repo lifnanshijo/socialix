@@ -3,6 +3,7 @@ import '../styles/clips.css'
 
 export function ClipCard({ clip, isOwner, onDelete }) {
   const [showOptions, setShowOptions] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this clip?')) {
@@ -10,26 +11,48 @@ export function ClipCard({ clip, isOwner, onDelete }) {
     }
   }
 
-  const getFileType = (url) => {
-    const ext = url.split('.').pop().toLowerCase()
-    if (['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv', 'wmv'].includes(ext)) {
+  const getFileType = (mimeType) => {
+    if (!mimeType) return 'image'
+    
+    if (mimeType.startsWith('video/')) {
       return 'video'
     }
     return 'image'
   }
 
-  const fileType = getFileType(clip.file_url)
+  const fileType = getFileType(clip.file_type)
+  const fileUrl = clip.file_url || `/api/clips/${clip.clip_id}/download`
 
   return (
     <div className="clip-card">
       <div className="clip-media">
         {fileType === 'video' ? (
-          <video controls>
-            <source src={clip.file_url} />
+          <video controls style={{ width: '100%', height: '100%', objectFit: 'cover' }}>
+            <source src={fileUrl} type={clip.file_type} />
             Your browser does not support the video tag.
           </video>
         ) : (
-          <img src={clip.file_url} alt="Clip" />
+          <img 
+            src={fileUrl} 
+            alt={clip.caption || 'Clip'}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={(e) => {
+              setImageError(true)
+              e.target.style.display = 'none'
+            }}
+          />
+        )}
+        {imageError && (
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f0f0f0'
+          }}>
+            <p>Image failed to load</p>
+          </div>
         )}
       </div>
 

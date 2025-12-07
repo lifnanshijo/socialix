@@ -52,15 +52,16 @@ export function ClipUpload({ onUploadSuccess }) {
       // Reset form
       e.target.reset()
 
-      // Notify parent component
+      // Notify parent component - this will trigger a refresh
       if (onUploadSuccess) {
         onUploadSuccess(uploadedClip)
       }
 
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(false), 3000)
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccess(false), 5000)
     } catch (err) {
       setError(err.message || 'Upload failed. Please try again.')
+      console.error('Upload error:', err)
     } finally {
       setUploading(false)
     }

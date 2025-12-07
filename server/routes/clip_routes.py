@@ -155,6 +155,7 @@ def get_user_clips(user_id):
 def download_clip(clip_id):
     """
     Download/retrieve clip file data from database
+    Returns the file as an inline response so it can be displayed in browsers
 
     GET /api/clips/<clip_id>/download
 
@@ -162,14 +163,13 @@ def download_clip(clip_id):
         bytes: File data with appropriate content-type header
     """
     try:
-        current_user_id = get_jwt_identity()
         clip = Clip.get_clip_by_id(clip_id)
 
         if not clip:
             logger.warning(f"Download attempt for non-existent clip_id={clip_id}")
             return jsonify({'error': 'Clip not found'}), 404
 
-        # Return file data with appropriate headers
+        # Return file data with appropriate headers for inline display
         from flask import send_file
         from io import BytesIO
 
@@ -177,7 +177,7 @@ def download_clip(clip_id):
         return send_file(
             file_stream,
             mimetype=clip['file_type'],
-            as_attachment=True,
+            as_attachment=False,  # Display inline instead of download
             download_name=clip['file_name']
         )
 
