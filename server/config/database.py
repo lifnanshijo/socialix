@@ -48,6 +48,23 @@ def init_db():
             INDEX idx_username (username)
         )
     """)
+    
+    # Add missing columns if they don't exist (for existing databases)
+    try:
+        cursor.execute("""
+            ALTER TABLE users 
+            ADD COLUMN IF NOT EXISTS avatar_type VARCHAR(50) AFTER avatar
+        """)
+    except Error:
+        pass  # Column already exists
+    
+    try:
+        cursor.execute("""
+            ALTER TABLE users 
+            ADD COLUMN IF NOT EXISTS cover_image_type VARCHAR(50) AFTER cover_image
+        """)
+    except Error:
+        pass  # Column already exists
 
     # Create posts table (for future use)
     cursor.execute("""
@@ -138,12 +155,31 @@ def init_db():
         )
     """)
 
+    # Create clips table (for stories feature)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS clips (
+            clip_id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            file_data LONGBLOB NOT NULL,
+            file_name VARCHAR(255) NOT NULL,
+            file_type VARCHAR(100) NOT NULL,
+            file_size INT NOT NULL,
+            caption TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expires_at TIMESTAMP NOT NULL,
+            is_deleted BOOLEAN DEFAULT FALSE,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_user_id (user_id),
+            INDEX idx_expires_at (expires_at)
+        )
+    """)
+
     connection.commit()
     cursor.close()
     connection.close()
     print("Database initialized successfully")
 
-def execute_query(query, params=None, fetch=False):
+def execute_query(query, params=None, fetch=False, commit=False):
     """Execute a query and return results if fetch=True"""
     connection = get_db_connection()
     if connection is None:
@@ -156,7 +192,8 @@ def execute_query(query, params=None, fetch=False):
             result = cursor.fetchall()
             return result
         else:
-            connection.commit()
+            if commit or not fetch:
+                connection.commit()
             return cursor.lastrowid
     except Error as e:
         print(f"Database error: {e}")

@@ -224,11 +224,15 @@ def delete_clip(clip_id):
     """
     try:
         current_user_id = get_jwt_identity()
+        current_user_id = int(current_user_id) if isinstance(current_user_id, str) else current_user_id
+
+        logger.info(f"Delete request: clip_id={clip_id}, user_id={current_user_id}")
 
         # Verify ownership and delete
         success = Clip.delete_clip(clip_id, current_user_id)
 
         if not success:
+            logger.warning(f"Delete failed: clip_id={clip_id}, user_id={current_user_id}")
             return jsonify({'error': 'Clip not found or unauthorized'}), 404
 
         logger.info(f"Clip deleted: clip_id={clip_id}, user_id={current_user_id}")

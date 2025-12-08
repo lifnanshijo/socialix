@@ -108,7 +108,8 @@ export function useClips() {
       })
 
       if (!response.ok) {
-        throw new Error('Delete failed')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || errorData.message || 'Delete failed')
       }
 
       // Remove from local state

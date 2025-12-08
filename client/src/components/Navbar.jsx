@@ -39,10 +39,11 @@ function Navbar() {
 
             {user ? (
               <>
-                <Link to="/home" className="btn">Home</Link>
-                <Link to="/chat" className="btn">Messages</Link>
-                <Link to="/clips" className="btn">Stories</Link>
-                <Link to="/profile" className="btn">Profile</Link>
+                <Link to="/home" className="btn">🏠 Home</Link>
+                <Link to="/search" className="btn">🔍 Search</Link>
+                <Link to="/chat" className="btn">💬 Messages</Link>
+                <Link to="/clips" className="btn">📸 Stories</Link>
+                <Link to="/profile" className="btn">👤 Profile</Link>
                 <button onClick={handleLogout} className="btn">Logout</button>
               </>
             ) : (

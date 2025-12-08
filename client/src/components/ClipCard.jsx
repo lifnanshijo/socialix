@@ -1,9 +1,48 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import '../styles/clips.css'
+
+const API_BASE = 'http://localhost:5000/api'
 
 export function ClipCard({ clip, isOwner, onDelete }) {
   const [showOptions, setShowOptions] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [mediaUrl, setMediaUrl] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchMedia = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await fetch(`${API_BASE}/clips/${clip.clip_id}/download`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to load media')
+        }
+
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        setMediaUrl(url)
+        setLoading(false)
+      } catch (err) {
+        console.error('Error loading media:', err)
+        setImageError(true)
+        setLoading(false)
+      }
+    }
+
+    fetchMedia()
+
+    // Cleanup blob URL on unmount
+    return () => {
+      if (mediaUrl) {
+        URL.revokeObjectURL(mediaUrl)
+      }
+    }
+  }, [clip.clip_id])
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this clip?')) {
@@ -21,28 +60,22 @@ export function ClipCard({ clip, isOwner, onDelete }) {
   }
 
   const fileType = getFileType(clip.file_type)
-  const fileUrl = clip.file_url || `/api/clips/${clip.clip_id}/download`
 
   return (
     <div className="clip-card">
       <div className="clip-media">
-        {fileType === 'video' ? (
-          <video controls style={{ width: '100%', height: '100%', objectFit: 'cover' }}>
-            <source src={fileUrl} type={clip.file_type} />
-            Your browser does not support the video tag.
-          </video>
-        ) : (
-          <img 
-            src={fileUrl} 
-            alt={clip.caption || 'Clip'}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            onError={(e) => {
-              setImageError(true)
-              e.target.style.display = 'none'
-            }}
-          />
-        )}
-        {imageError && (
+        {loading ? (
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f0f0f0'
+          }}>
+            <p>Loading...</p>
+          </div>
+        ) : imageError ? (
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -53,6 +86,20 @@ export function ClipCard({ clip, isOwner, onDelete }) {
           }}>
             <p>Image failed to load</p>
           </div>
+        ) : fileType === 'video' ? (
+          <video controls style={{ width: '100%', height: '100%', objectFit: 'cover' }}>
+            <source src={mediaUrl} type={clip.file_type} />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <img 
+            src={mediaUrl} 
+            alt={clip.caption || 'Clip'}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={(e) => {
+              setImageError(true)
+            }}
+          />
         )}
       </div>
 

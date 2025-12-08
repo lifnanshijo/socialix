@@ -100,3 +100,20 @@ CREATE TABLE IF NOT EXISTS followers (
     INDEX idx_follower (follower_id),
     INDEX idx_following (following_id)
 );
+
+-- Clips table (for stories feature)
+CREATE TABLE IF NOT EXISTS clips (
+    clip_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    file_data LONGBLOB NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_type VARCHAR(100) NOT NULL,
+    file_size INT NOT NULL,
+    caption TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_expires_at (expires_at)
+);

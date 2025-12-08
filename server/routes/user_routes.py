@@ -153,7 +153,7 @@ def search_users():
         from config.database import execute_query
         
         search_query = """
-            SELECT id, username, email, bio, avatar, avatar_type, cover_image, cover_image_type, created_at, updated_at
+            SELECT id, username, email, bio, avatar, cover_image, created_at, updated_at
             FROM users 
             WHERE username LIKE %s AND id != %s
             LIMIT 20
