@@ -3,6 +3,7 @@ from flask_jwt_extended import get_jwt_identity
 from middleware.auth import token_required
 from models.follow import Follow
 from models.user import User
+from models.notification import Notification
 
 follow_bp = Blueprint('follow', __name__)
 
@@ -20,6 +21,16 @@ def follow_user(user_id):
         result = Follow.follow_user(current_user_id, user_id)
         if result is None:
             return jsonify({'error': 'Already following or invalid user'}), 400
+        
+        # Create notification for the followed user
+        current_user = User.find_by_id(current_user_id)
+        if current_user:
+            Notification.create_notification(
+                user_id=user_id,
+                sender_id=current_user_id,
+                notification_type='follow',
+                content=f"{current_user['username']} started following you"
+            )
         
         return jsonify({'success': True, 'message': 'User followed'}), 200
     except Exception as e:

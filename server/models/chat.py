@@ -93,6 +93,17 @@ class Chat:
         return result
     
     @staticmethod
+    def get_conversation_by_id(conversation_id):
+        """Get conversation details by ID"""
+        query = """
+            SELECT id, user1_id, user2_id, created_at, updated_at
+            FROM conversations
+            WHERE id = %s
+        """
+        result = execute_query(query, (conversation_id,), fetch=True)
+        return result[0] if result else None
+    
+    @staticmethod
     def search_users(search_term, current_user_id):
         """Search for users to start a conversation with"""
         query = """

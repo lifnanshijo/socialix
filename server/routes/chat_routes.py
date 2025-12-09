@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity
 from middleware.auth import token_required
 from models.chat import Chat
+from models.notification import Notification
+from models.user import User
 
 chat_bp = Blueprint('chat', __name__)
 
@@ -56,6 +58,21 @@ def send_message(conversation_id):
             return jsonify({'error': 'Message content is required'}), 400
         
         message_id = Chat.send_message(conversation_id, current_user_id, content)
+        
+        # Get the other user in the conversation and create notification
+        conversation = Chat.get_conversation_by_id(conversation_id)
+        if conversation:
+            other_user_id = conversation['user2_id'] if conversation['user1_id'] == current_user_id else conversation['user1_id']
+            current_user = User.find_by_id(current_user_id)
+            if current_user and other_user_id:
+                Notification.create_notification(
+                    user_id=other_user_id,
+                    sender_id=current_user_id,
+                    notification_type='message',
+                    content=f"{current_user['username']} sent you a message",
+                    reference_id=conversation_id
+                )
+        
         return jsonify({'message_id': message_id, 'success': True}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500

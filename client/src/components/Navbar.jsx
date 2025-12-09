@@ -2,13 +2,17 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import { useNotifications } from '../hooks/useNotifications'
+import { NotificationDropdown } from './NotificationDropdown'
 import '../styles/navbar.css'
 
 function Navbar() {
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { unreadCount } = useNotifications()
   const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -44,6 +48,16 @@ function Navbar() {
                 <Link to="/chat" className="btn">💬 Messages</Link>
                 <Link to="/clips" className="btn">📸 Stories</Link>
                 <Link to="/profile" className="btn">👤 Profile</Link>
+                <button 
+                  className="notification-bell btn" 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  aria-label="Notifications"
+                >
+                  🔔
+                  {unreadCount > 0 && (
+                    <span className="notification-badge">{unreadCount}</span>
+                  )}
+                </button>
                 <button onClick={handleLogout} className="btn">Logout</button>
               </>
             ) : (
@@ -102,6 +116,11 @@ function Navbar() {
           </nav>
         </>
       )}
+      
+      <NotificationDropdown 
+        show={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+      />
     </>
   )
 }

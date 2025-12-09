@@ -174,6 +174,25 @@ def init_db():
         )
     """)
 
+    # Create notifications table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            sender_id INT NOT NULL,
+            type ENUM('message', 'follow', 'like', 'comment') NOT NULL,
+            content TEXT,
+            reference_id INT,
+            is_read BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_user_id (user_id),
+            INDEX idx_is_read (is_read),
+            INDEX idx_created_at (created_at)
+        )
+    """)
+
     connection.commit()
     cursor.close()
     connection.close()

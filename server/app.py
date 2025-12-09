@@ -8,6 +8,7 @@ from routes.post_routes import post_bp
 from routes.chat_routes import chat_bp
 from routes.follow_routes import follow_bp
 from routes.clip_routes import clips_bp
+from routes.notification_routes import notification_bp
 from utils.clips_scheduler import ClipsScheduler
 import os
 from dotenv import load_dotenv
@@ -35,6 +36,7 @@ app.register_blueprint(post_bp, url_prefix='/api/posts')
 app.register_blueprint(chat_bp, url_prefix='/api/chat')
 app.register_blueprint(follow_bp, url_prefix='/api/users')
 app.register_blueprint(clips_bp, url_prefix='/api/clips')
+app.register_blueprint(notification_bp, url_prefix='/api/notifications')
 
 @app.route('/')
 def home():
