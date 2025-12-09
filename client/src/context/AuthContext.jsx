@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is logged in on mount
     const token = localStorage.getItem('token')
+    console.log('AuthContext mounting, token exists:', !!token)
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       fetchUser()
@@ -29,14 +30,24 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
+      console.log('Fetching user with token...')
       const response = await axios.get(`${API_URL}/api/auth/me`)
+      console.log('User fetched successfully:', response.data)
       setUser(response.data)
     } catch (err) {
-      console.error('Failed to fetch user:', err)
-      // Token is invalid or expired, clear it
-      localStorage.removeItem('token')
-      delete axios.defaults.headers.common['Authorization']
-      setUser(null)
+      console.error('Failed to fetch user:', err.response?.status, err.response?.data)
+      // Only clear token if it's actually invalid (401), not on network errors
+      if (err.response?.status === 401) {
+        console.log('Token invalid, clearing...')
+        localStorage.removeItem('token')
+        delete axios.defaults.headers.common['Authorization']
+        setUser(null)
+      } else {
+        console.log('Network error, keeping token')
+        // Keep the user logged in on network errors
+        setLoading(false)
+        return
+      }
     } finally {
       setLoading(false)
     }
@@ -47,13 +58,12 @@ export const AuthProvider = ({ children }) => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401) {
+        // Only handle 401 if we have a token stored (user should be logged in)
+        if (error.response?.status === 401 && localStorage.getItem('token')) {
           console.log('Token expired or invalid, logging out')
           localStorage.removeItem('token')
           delete axios.defaults.headers.common['Authorization']
           setUser(null)
-          // Optionally redirect to login
-          window.location.href = '/login'
         }
         return Promise.reject(error)
       }
@@ -142,6 +152,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    isAuthenticated: !!user,
     login,
     signup,
     loginWithGoogle,
@@ -152,7 +163,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   )
 }

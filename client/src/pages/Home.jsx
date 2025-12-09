@@ -33,7 +33,7 @@ function Home() {
 
   const fetchPosts = async () => {
     try {
-      const response = await axios.get('/api/posts/feed')
+      const response = await axios.get('http://localhost:5000/api/posts/feed')
       const postsData = response.data.posts || response.data || []
       setPosts(postsData)
       
@@ -51,7 +51,7 @@ function Home() {
 
   const fetchPostLikes = async (postId) => {
     try {
-      const response = await axios.get(`/api/posts/${postId}/likes`)
+      const response = await axios.get(`http://localhost:5000/api/posts/${postId}/likes`)
       setPostLikes(prev => ({
         ...prev,
         [postId]: {
@@ -66,7 +66,7 @@ function Home() {
 
   const fetchPostComments = async (postId) => {
     try {
-      const response = await axios.get(`/api/posts/${postId}/comments`)
+      const response = await axios.get(`http://localhost:5000/api/posts/${postId}/comments`)
       setPostComments(prev => ({
         ...prev,
         [postId]: response.data
@@ -81,9 +81,9 @@ function Home() {
       const isLiked = postLikes[postId]?.isLiked
       
       if (isLiked) {
-        await axios.post(`/api/posts/${postId}/unlike`)
+        await axios.post(`http://localhost:5000/api/posts/${postId}/unlike`)
       } else {
-        await axios.post(`/api/posts/${postId}/like`)
+        await axios.post(`http://localhost:5000/api/posts/${postId}/like`)
       }
       
       fetchPostLikes(postId)
@@ -97,7 +97,7 @@ function Home() {
     if (!comment) return
 
     try {
-      await axios.post(`/api/posts/${postId}/comments`, { content: comment })
+      await axios.post(`http://localhost:5000/api/posts/${postId}/comments`, { content: comment })
       setCommentText(prev => ({ ...prev, [postId]: '' }))
       fetchPostComments(postId)
     } catch (err) {
@@ -109,7 +109,7 @@ function Home() {
     if (!window.confirm('Delete this comment?')) return
 
     try {
-      await axios.delete(`/api/posts/comments/${commentId}`)
+      await axios.delete(`http://localhost:5000/api/posts/comments/${commentId}`)
       fetchPostComments(postId)
     } catch (err) {
       console.error('Failed to delete comment:', err)
@@ -178,7 +178,7 @@ function Home() {
         formData.append('image', imageFile)
       }
 
-      const response = await axios.post('/api/posts/create', formData, {
+      const response = await axios.post('http://localhost:5000/api/posts/create', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
