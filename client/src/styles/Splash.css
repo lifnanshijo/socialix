@@ -1,0 +1,81 @@
+/* Splash Screen Styles */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  animation: fadeOutSplash 0.5s ease-in forwards 2s;
+}
+
+.splash-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.splash-logo {
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffffff 0%, #ffd700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  animation: splashBounce 0.8s ease-out;
+}
+
+.splash-loader {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes splashBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeOutSplash {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .splash-logo {
+    font-size: 2.5rem;
+  }
+
+  .splash-loader {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+}

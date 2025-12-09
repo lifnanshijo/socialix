@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import Splash from './pages/Splash'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Profile from './pages/Profile'
@@ -23,6 +24,7 @@ function App() {
       <Router>
         <ThemeProvider>
           <AuthProvider>
+            <Splash />
             <div className="app">
               <Navbar />
               <Routes>
