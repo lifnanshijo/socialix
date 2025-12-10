@@ -4,8 +4,9 @@ import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { useNotifications } from '../hooks/useNotifications'
 import { NotificationDropdown } from './NotificationDropdown'
-import { Home, Search, MessageSquare, Camera, User, Moon, Sun, LogOut, LogIn } from 'lucide-react'
+import { Home, Search, MessageSquare, Camera, User, Moon, Sun, LogOut, LogIn, Menu, X } from 'lucide-react'
 import '../styles/navbar.css'
+import '../styles/sidebar.css'
 
 function Navbar() {
   const { user, logout } = useAuth()
@@ -14,6 +15,7 @@ function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
   const [showNotifications, setShowNotifications] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -28,6 +30,14 @@ function Navbar() {
     <>
       <nav className="navbar">
         <div className="navbar-container">
+          <button 
+            className="navbar-menu-toggle"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle menu"
+          >
+            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
           <Link to="/home" className="navbar-brand">
             {/* Brand Logo with X-Symbol and Text */}
             <div className="brand-logo">
@@ -127,6 +137,128 @@ function Navbar() {
           </div>
         </div>
       </nav>
+
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+
+      {/* Sidebar Dropdown Menu */}
+      <aside className={`sidebar-dropdown ${sidebarOpen ? 'open' : ''}`}>
+        {/* Sidebar Header */}
+        <div className="sidebar-header">
+          <h2>SocialX</h2>
+          <button
+            className="sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Main Navigation Section */}
+        <nav className="sidebar-section">
+          <div className="sidebar-section-title">Navigation</div>
+
+          <Link
+            to="/home"
+            className={`sidebar-item ${isActive('/home') ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+            title="Home"
+          >
+            <Home size={20} strokeWidth={2} />
+            <span>Home</span>
+          </Link>
+
+          <Link
+            to="/search"
+            className={`sidebar-item ${isActive('/search') ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+            title="Search"
+          >
+            <Search size={20} strokeWidth={2} />
+            <span>Search</span>
+          </Link>
+
+          <Link
+            to="/chat"
+            className={`sidebar-item ${isActive('/chat') ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+            title="Messages"
+          >
+            <MessageSquare size={20} strokeWidth={2} />
+            <span>Messages</span>
+          </Link>
+
+          <Link
+            to="/clips"
+            className={`sidebar-item ${isActive('/clips') ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+            title="Stories"
+          >
+            <Camera size={20} strokeWidth={2} />
+            <span>Stories</span>
+          </Link>
+
+          {user && (
+            <Link
+              to="/profile"
+              className={`sidebar-item ${isActive('/profile') ? 'active' : ''}`}
+              onClick={() => setSidebarOpen(false)}
+              title="Profile"
+            >
+              <User size={20} strokeWidth={2} />
+              <span>Profile</span>
+            </Link>
+          )}
+        </nav>
+
+        {/* Divider */}
+        <div className="sidebar-divider" />
+
+        {/* Settings Section */}
+        <div className="sidebar-section">
+          <div className="sidebar-section-title">Settings</div>
+
+          <button
+            className="sidebar-item theme-item"
+            onClick={() => {
+              toggleTheme()
+              setSidebarOpen(false)
+            }}
+            title={theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          >
+            {theme === 'light' ? (
+              <Moon size={20} strokeWidth={2} />
+            ) : (
+              <Sun size={20} strokeWidth={2} />
+            )}
+            <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+          </button>
+
+          {user ? (
+            <button
+              className="sidebar-item logout-item"
+              onClick={() => {
+                handleLogout()
+                setSidebarOpen(false)
+              }}
+              title="Logout"
+            >
+              <LogOut size={20} strokeWidth={2} />
+              <span>Logout</span>
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="sidebar-item login-item"
+              onClick={() => setSidebarOpen(false)}
+              title="Login"
+            >
+              <LogIn size={20} strokeWidth={2} />
+              <span>Login</span>
+            </Link>
+          )}
+        </div>
+      </aside>
 
       <NotificationDropdown 
         show={showNotifications} 

@@ -189,7 +189,7 @@ input,
 textarea {
   width: 100%;
   padding: 12px 16px;
-  background: var(--socialx-bg-card);
+  background: #0C0F14;
   border: 1px solid var(--socialx-primary-cyan);
   border-radius: var(--socialx-input-radius);
   color: var(--text-primary);
@@ -207,8 +207,10 @@ textarea::placeholder {
 input:focus,
 textarea:focus {
   outline: none;
+  background: #0C0F14;
   border-color: var(--socialx-primary-magenta);
   box-shadow: 0 0 12px rgba(210, 78, 255, 0.3);
+  color: var(--text-primary);
 }
 
 .input-field:hover,

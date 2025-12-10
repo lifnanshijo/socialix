@@ -17,6 +17,29 @@
   gap: 20px;
 }
 
+.navbar-menu-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--socialx-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.navbar-menu-toggle:hover {
+  background: rgba(42, 204, 235, 0.08);
+  color: #2ACCEB;
+}
+
+.navbar-menu-toggle:active {
+  transform: scale(0.95);
+}
+
 .navbar-brand {
   font-size: 24px;
   font-weight: 700;
@@ -25,7 +48,7 @@
   align-items: center;
   gap: 12px;
   transition: transform 0.2s ease;
-  margin-left: 56px;
+  margin-left: -8px;
 }
 
 .navbar-brand:hover {
@@ -41,12 +64,10 @@
   padding: 8px 12px;
   border-radius: 8px;
   transition: all 0.3s ease;
-  background: rgba(42, 204, 235, 0.05);
   flex-shrink: 0;
 }
 
 .navbar-brand:hover .brand-logo {
-  background: rgba(35, 199, 255, 0.05);
 }
 
 /* Brand X Icon */

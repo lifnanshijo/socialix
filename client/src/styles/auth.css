@@ -170,7 +170,7 @@
 .input-field {
   width: 100%;
   padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.3);
+  background: #0C0F14 !important;
   border: 1px solid var(--socialx-primary-cyan);
   border-radius: var(--socialx-input-radius);
   color: var(--text-primary);
@@ -184,13 +184,27 @@
 
 .input-field:focus {
   outline: none;
+  background: #0C0F14 !important;
   border-color: var(--socialx-primary-magenta);
   box-shadow: 0 0 12px rgba(210, 78, 255, 0.3);
+  color: var(--text-primary);
 }
 
 .input-field:hover {
   border-color: var(--socialx-primary-aqua);
   box-shadow: 0 0 8px rgba(35, 199, 255, 0.2);
+}
+
+/* Global input styles for auth page */
+.auth-form input,
+.auth-form textarea {
+  background: #0C0F14 !important;
+  color: var(--text-primary) !important;
+}
+
+.auth-form input:focus,
+.auth-form textarea:focus {
+  background: #0C0F14 !important;
 }
 
 /* Form row for checkbox and forgot password */
