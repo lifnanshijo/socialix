@@ -47,12 +47,13 @@
 
 /* Upload Form */
 .clip-upload-container {
-  background: white;
+  background: var(--socialx-bg-card, #1a1a2e);
   border-radius: 12px;
   padding: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   max-width: 600px;
   margin: 0 auto;
+  color: var(--socialx-text-primary, #d6dae0);
 }
 
 .clip-upload-form {
@@ -79,7 +80,7 @@
 .file-label-text {
   display: block;
   padding: 15px;
-  border: 2px dashed #ddd;
+  border: 2px dashed var(--socialx-text-secondary, #999);
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
@@ -114,8 +115,8 @@ textarea:focus {
 
 .submit-button {
   padding: 12px 24px;
-  background: var(--primary-color, #007bff);
-  color: white;
+  background: linear-gradient(135deg, #2ACCEB, #6E62F9);
+  color: #D6DAE0;
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -125,9 +126,9 @@ textarea:focus {
 }
 
 .submit-button:hover:not(:disabled) {
-  background: var(--primary-dark, #0056b3);
+  background: linear-gradient(135deg, #6E62F9, #2ACCEB);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(42, 204, 235, 0.3);
 }
 
 .submit-button:disabled {

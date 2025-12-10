@@ -7,3 +7,6 @@ bcrypt==4.1.2
 google-auth==2.25.2
 google-auth-oauthlib==1.2.0
 google-auth-httplib2==0.2.0
+apscheduler==3.10.4
+schedule==1.2.0
+

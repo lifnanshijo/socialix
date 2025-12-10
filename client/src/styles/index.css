@@ -4,30 +4,86 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+  width: 100%;
+}
+
 :root {
-  /* Socialix Branding Colors */
+  /* ===================================
+     SOCIALX PROFESSIONAL CALM PALETTE
+     Production-ready dark mode system
+     =================================== */
+
+  /* Primary Brand Colors - Professional & Calm */
+  --socialx-primary-cyan: #2ACCEB;
+  --socialx-primary-violet: #6E62F9;
+  --socialx-primary-magenta: #6E62F9;
+
+  /* Background System - Neutral Deep Dark */
+  --socialx-bg-main: #0C0F14;
+  --socialx-bg-card: #13171F;
+  --socialx-bg-panel: #13171F;
+
+  /* Text Colors */
+  --socialx-text-primary: #D6DAE0;
+  --socialx-text-secondary: #A4A7AE;
+  --socialx-text-muted: #70737A;
+
+  /* UI State Colors - Semantic Feedback */
+  --socialx-success: #3AE67F;
+  --socialx-warning: #FFC343;
+  --socialx-error: #FF4D5A;
+
+  /* Glow Effect */
+  --socialx-glow: rgba(255, 255, 255, 0.15);
+
+  /* Legacy Support & Aliases */
+  --socialx-gradient: linear-gradient(135deg, #2ACCEB, #6E62F9);
+  --color-background: #0C0F14;
+  --color-surface: #13171F;
+  --color-border: #13171F;
+  --primary-cyan: #2ACCEB;
+  --primary-blue: #6E62F9;
+  --primary-purple: #6E62F9;
+  --primary-orange: #FF6B35;
+  --primary-gradient: linear-gradient(135deg, #2ACCEB, #6E62F9);
+  
+  --primary-color: #2ACCEB;
+  --secondary-color: #6E62F9;
+  --accent-color: #6E62F9;
+  
+  --background-light: #f8f9ff;
+  --background-dark: #0C0F14;
+  --card-light: #ffffff;
+  --card-dark: #13171F;
+  
+  --text-light: #1a1f2e;
+  --text-dark: #D6DAE0;
+  
+  --border-light: #e0e6ff;
+  --border-dark: #13171F;
+}
+  
+  /* Legacy support */
   --primary-cyan: #00d4ff;
   --primary-blue: #3366ff;
   --primary-purple: #9933ff;
   --primary-orange: #ff6633;
   --primary-gradient: linear-gradient(135deg, #00d4ff, #3366ff, #9933ff, #ff6633);
   
-  /* Primary colors for UI */
   --primary-color: #3366ff;
   --secondary-color: #ff6633;
   --accent-color: #00d4ff;
   
-  /* Background colors */
   --background-light: #f8f9ff;
   --background-dark: #0f1419;
   --card-light: #ffffff;
   --card-dark: #1a1f2e;
   
-  /* Text colors */
   --text-light: #1a1f2e;
   --text-dark: #f0f2f5;
   
-  /* Border colors */
   --border-light: #e0e6ff;
   --border-dark: #2a3347;
 }
@@ -39,18 +95,47 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease;
+  height: 100%;
+  width: 100%;
+  background-color: var(--socialx-bg-main);
 }
 
 .app {
   min-height: 100vh;
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(51, 102, 255, 0.05) 25%, rgba(153, 51, 255, 0.05) 75%, rgba(255, 102, 51, 0.05) 100%);
+  background: var(--socialx-bg-main);
   position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1025px) {
+  .app {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .app {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .app {
+    margin-left: 0;
+  }
 }
 
 /* Light Theme */
 .light-theme {
   background-color: var(--background-light);
   color: var(--text-light);
+  --socialx-bg-main: #FFFFFF;
+  --socialx-bg-card: #FFFFFF;
+  --socialx-bg-panel: #FFFFFF;
+  --socialx-text-primary: #050505;
+  --socialx-text-secondary: #666666;
 }
 
 .light-theme .card {

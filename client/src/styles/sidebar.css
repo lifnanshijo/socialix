@@ -1,0 +1,350 @@
+/* ===================================
+   SIDEBAR DROPDOWN MENU STYLES
+   Icon-triggered dropdown navigation
+   =================================== */
+
+/* Toggle Button */
+.sidebar-toggle-icon {
+  position: fixed;
+  top: 9px;
+  left: 12px;
+  z-index: 1100;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--socialx-text-primary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+}
+
+.sidebar-toggle-icon:hover {
+  background: rgba(42, 204, 235, 0.08);
+  color: #2ACCEB;
+  transform: scale(1.1);
+}
+
+.sidebar-toggle-icon:active {
+  transform: scale(0.95);
+}
+
+.sidebar-toggle-icon svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1099;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sidebar-overlay.open {
+  display: block;
+}
+
+/* Sidebar Dropdown Container */
+.sidebar-dropdown {
+  position: fixed;
+  top: 72px;
+  left: 20px;
+  width: 280px;
+  max-height: calc(100vh - 100px);
+  background: var(--socialx-bg-main);
+  border: 1px solid rgba(42, 204, 235, 0.2);
+  border-radius: 12px;
+  z-index: 1050;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(42, 204, 235, 0.1);
+  transform: scale(0.95) translateY(-10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sidebar-dropdown.open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(42, 204, 235, 0.1);
+  background: rgba(42, 204, 235, 0.02);
+}
+
+.sidebar-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #2ACCEB;
+  margin: 0;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #2ACCEB, #6E62F9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #D4D7DD;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(42, 204, 235, 0.1);
+  color: #2ACCEB;
+}
+
+.sidebar-close-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Sidebar Sections */
+.sidebar-section {
+  padding: 12px 0;
+}
+
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #70737A;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 12px 20px 8px;
+  margin: 0;
+}
+
+/* Sidebar Items (Links and Buttons) */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  color: #D4D7DD;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 100%;
+  text-align: left;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #2ACCEB;
+  transform: translateX(4px);
+}
+
+.sidebar-item.active {
+  background: linear-gradient(90deg, rgba(42, 204, 235, 0.1), rgba(42, 204, 235, 0.05));
+  color: #2ACCEB;
+  border-left-color: #2ACCEB;
+  font-weight: 600;
+  box-shadow: inset 0 0 10px rgba(42, 204, 235, 0.1);
+}
+
+.sidebar-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke-width: 2;
+}
+
+.sidebar-item span {
+  flex: 1;
+}
+
+/* Notification Badge */
+.notification-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #FF4D5A;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(255, 77, 90, 0.6);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* Theme Toggle Item */
+.sidebar-item.theme-item {
+  justify-content: flex-start;
+}
+
+/* Logout Item */
+.sidebar-item.logout-item {
+  color: #FF4D5A;
+}
+
+.sidebar-item.logout-item:hover {
+  background: rgba(255, 77, 90, 0.1);
+  color: #FF4D5A;
+}
+
+/* Login Item */
+.sidebar-item.login-item {
+  color: #3AE67F;
+}
+
+.sidebar-item.login-item:hover {
+  background: rgba(58, 230, 127, 0.1);
+  color: #3AE67F;
+}
+
+/* Divider */
+.sidebar-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(42, 204, 235, 0.2), transparent);
+  margin: 8px 0;
+}
+
+/* Custom Scrollbar */
+.sidebar-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-dropdown::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.sidebar-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(42, 204, 235, 0.3);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.sidebar-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgba(42, 204, 235, 0.6);
+}
+
+/* Accessibility */
+.sidebar-item:focus-visible {
+  outline: 2px solid #2ACCEB;
+  outline-offset: -2px;
+}
+
+.sidebar-toggle-icon:focus-visible {
+  outline: 2px solid #2ACCEB;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+.sidebar-item {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sidebar-item:active {
+  transform: scale(0.98);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .sidebar-toggle-icon {
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar-dropdown {
+    top: 60px;
+    left: 12px;
+    width: calc(100% - 24px);
+    max-width: 300px;
+  }
+
+  .sidebar-item {
+    padding: 10px 16px;
+    font-size: 14px;
+    gap: 12px;
+  }
+
+  .sidebar-item svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sidebar-section-title {
+    padding: 10px 16px 6px;
+  }
+}
+
+/* Responsive for larger screens */
+@media (min-width: 1025px) {
+  .sidebar-toggle-icon {
+    top: 24px;
+    left: 24px;
+  }
+
+  .sidebar-dropdown {
+    top: 74px;
+    left: 24px;
+  }
+}

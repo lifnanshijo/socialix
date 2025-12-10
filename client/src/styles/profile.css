@@ -10,24 +10,21 @@
 
 .cover-image {
   height: 300px;
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(51, 102, 255, 0.2), rgba(153, 51, 255, 0.2));
+  background: linear-gradient(135deg, rgba(35, 199, 255, 0.2), rgba(59, 243, 247, 0.2), rgba(138, 75, 255, 0.2), rgba(210, 78, 255, 0.2));
   background-size: cover;
   background-position: center;
   border-radius: 16px 16px 0 0;
   position: relative;
-  border-bottom: 3px solid;
-  border-image: linear-gradient(90deg, #00d4ff, #3366ff, #9933ff, #ff6633) 1;
 }
 
 .profile-info {
   background: inherit;
-  padding: 0 30px 20px;
+  padding: 30px 30px 20px;
   position: relative;
   border-radius: 0 0 16px 16px;
-  border: 2px solid;
-  border-image: linear-gradient(135deg, #00d4ff, #3366ff, #9933ff, #ff6633) 1;
-  border-top: none;
 }
+
+
 
 .avatar {
   width: 150px;
@@ -36,11 +33,13 @@
   background-size: cover;
   background-position: center;
   border: 5px solid;
-  border-color: #00d4ff;
+  border-color: var(--socialx-primary-cyan);
   margin-top: -75px;
   position: relative;
-  box-shadow: 0 0 25px rgba(0, 212, 255, 0.5), 0 0 40px rgba(51, 102, 255, 0.3);
-  overflow: hidden;
+  box-shadow: 0 0 25px rgba(59, 243, 247, 0.6), 0 0 40px rgba(35, 199, 255, 0.4);
+  overflow: visible;
+  z-index: 10;
+  margin-left: 30px;
 }
 
 .user-details {
@@ -50,7 +49,10 @@
 .user-details h1 {
   font-size: 32px;
   margin-bottom: 10px;
-  color: var(--primary-color);
+  background: var(--socialx-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-weight: 700;
 }
 

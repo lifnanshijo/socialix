@@ -1,0 +1,394 @@
+/* ===================================
+   MICROINTERACTIONS & ANIMATIONS
+   Premium feel with subtle motion
+   =================================== */
+
+/* Button Interactions */
+button, .btn, input[type="submit"], input[type="button"] {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+button:hover:not(:disabled),
+.btn:hover:not(:disabled),
+input[type="submit"]:hover:not(:disabled),
+input[type="button"]:hover:not(:disabled) {
+  transform: scale(1.02);
+}
+
+button:active:not(:disabled),
+.btn:active:not(:disabled),
+input[type="submit"]:active:not(:disabled),
+input[type="button"]:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Card Lift Effect */
+.card, .post-card, [class*="card"], [class*="item"] {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card:hover, 
+.post-card:hover,
+[class*="card"]:hover,
+[class*="item"]:hover:not(.disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Icon Hover Glow */
+[class*="icon"], svg, i {
+  transition: all 0.25s ease;
+}
+
+button:hover [class*="icon"],
+button:hover svg,
+button:hover i,
+a:hover [class*="icon"],
+a:hover svg,
+a:hover i {
+  filter: drop-shadow(0 0 8px rgba(42, 204, 235, 0.4));
+  transform: scale(1.05);
+}
+
+/* Like Button Pop Animation */
+@keyframes likePop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.like-btn.active,
+.like-button.active,
+[class*="like"]:not(.unlike) {
+  animation: likePop 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Input Focus Glow */
+input, textarea, select {
+  transition: all 0.2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(42, 204, 235, 0.2);
+}
+
+/* Link Hover Underline */
+a {
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: #2ACCEB;
+}
+
+/* Smooth Page Transitions */
+.page-enter {
+  animation: pageEnter 0.3s ease-out;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bounce on Mount */
+.bounce-in {
+  animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Pulse for Notifications */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.notification, [class*="alert"], [class*="toast"] {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Smooth Color Transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner, [class*="loader"], .loading {
+  animation: spin 1s linear infinite;
+}
+
+/* Skeleton Loading Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #13171F 25%,
+    #1A1D26 50%,
+    #13171F 75%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Dropdown Menu Appear */
+@keyframes dropdownAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[class*="dropdown"]:not(.hidden),
+[class*="menu"]:not(.hidden),
+.popover:not(.hidden) {
+  animation: dropdownAppear 0.2s ease-out;
+}
+
+/* Modal Slide In */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal, [class*="dialog"], .sheet {
+  animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Toast Slide In */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.toast {
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+/* Success Checkmark Animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+[class*="success"], .check, [class*="checkmark"] {
+  animation: checkmark 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Fade In */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Ripple Effect on Click */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(42, 204, 235, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ripple 0.6s ease-out;
+}
+
+/* Image Fade In */
+@keyframes imageLoad {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+img, .image, [class*="img"] {
+  animation: imageLoad 0.4s ease-out;
+}
+
+/* Text Appear */
+@keyframes textAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  animation: textAppear 0.5s ease-out;
+}
+
+/* Progress Bar Fill */
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+[class*="progress"] {
+  animation: progressFill 0.8s ease-out;
+}
+
+/* Disable transitions on reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Hover state for interactive elements */
+.interactive, [role="button"], [role="link"] {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.interactive:hover,
+[role="button"]:hover,
+[role="link"]:hover {
+  transform: translateY(-1px);
+}
+
+/* Disabled state */
+:disabled, .disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid #2ACCEB;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(42, 204, 235, 0.3);
+  color: #D6DAE0;
+}
+
+::-moz-selection {
+  background: rgba(42, 204, 235, 0.3);
+  color: #D6DAE0;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0C0F14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2ACCEB;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6E62F9;
+}

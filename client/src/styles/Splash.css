@@ -1,100 +1,487 @@
-/* Splash Screen Styles */
+/* ================================
+   SPLASH SCREEN - PRODUCTION READY
+   ================================ */
+
 .splash-screen {
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #0f1419 0%, #1a2a4e 50%, #2a1a4e 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 99999;
-  animation: fadeOutSplash 0.5s ease-in forwards 2s;
-}
-
-.splash-content {
-  text-align: center;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 25px;
+  justify-content: center;
+  background: linear-gradient(180deg, #050505 0%, #0a0f1a 50%, #050505 100%);
+  z-index: 9999;
+  overflow: hidden;
 }
 
-.splash-logo-container {
-  animation: splashBounce 0.8s ease-out;
+/* Light mode splash screen */
+.splash-screen.light-mode {
+  background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 50%, #f5f5f5 100%);
 }
 
-.splash-logo-container svg {
-  filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.5));
+.splash-screen.light-mode .mesh-lines {
+  opacity: 0.08;
 }
 
-.splash-text {
-  font-size: 3rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, #00d4ff, #3366ff, #9933ff, #ff6633);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 2px;
-  margin: 0;
-  animation: splashBounce 0.8s ease-out 0.1s both;
+.splash-screen.light-mode .mesh-node {
+  opacity: 0.4;
 }
 
-.splash-subtitle {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 1px;
-  margin: 0;
-  animation: fadeIn 1s ease-out 0.3s both;
+.splash-screen.light-mode .particle {
+  box-shadow: 0 0 15px currentColor;
 }
 
-.splash-loader {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(0, 212, 255, 0.2);
-  border-top: 4px solid #00d4ff;
-  border-right: 4px solid #3366ff;
-  border-radius: 50%;
-  animation: spin 1.5s linear infinite;
-  margin-top: 20px;
+.splash-screen.light-mode .splash-title {
+  color: #050505;
 }
 
-@keyframes splashBounce {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  100% {
+.splash-screen.light-mode .splash-subtitle {
+  color: #333333;
+}
+
+.splash-screen.splash-exit {
+  animation: splashExit 300ms ease-in forwards;
+}
+
+@keyframes splashExit {
+  from {
     opacity: 1;
     transform: scale(1);
   }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
-@keyframes spin {
+/* ================================
+   TECH MESH BACKGROUND
+   ================================ */
+
+.splash-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  opacity: 0.12;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mesh-bg {
+  width: 100%;
+  height: 100%;
+  animation: meshPan 40s linear infinite;
+}
+
+@keyframes meshPan {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, 20px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.mesh-lines {
+  opacity: 0.12;
+}
+
+.mesh-node {
+  animation: nodePulse 3s ease-in-out infinite;
+}
+
+/* ================================
+   MAIN SPLASH CONTENT
+   ================================ */
+
+.splash-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+/* ================================
+   ORB CONTAINER & GLOW
+   ================================ */
+
+.orb-container {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Neon Glow Orb - Soft neon glow behind X */
+.glow-orb {
+  display: none;
+}
+
+@keyframes glowOrbPulse {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes glowOrbAppear {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Gradient Energy Flow - Looping gradient motion */
+.energy-gradient {
+  display: none;
+}
+
+@keyframes energyFlow {
+  from {
+    transform: rotate(0deg);
+  }
   to {
     transform: rotate(360deg);
   }
 }
 
-@keyframes fadeOutSplash {
+/* Glow effect behind X */
+.logo-glow {
+  display: none;
+}
+
+/* X-Symbol Reveal Animation */
+.logo-x {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  opacity: 0;
+  animation: xReveal 450ms ease-out 200ms forwards;
+  z-index: 2;
+  filter: drop-shadow(0 0 20px rgba(35, 199, 255, 0.6)) drop-shadow(0 0 40px rgba(210, 78, 255, 0.3));
+}
+
+@keyframes xReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.85) rotate(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.x-line {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ================================
+   BRAND TEXT ANIMATION
+   ================================ */
+
+.splash-text {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.splash-title {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #23C7FF, #3BF3F7, #8A4BFF, #D24EFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: titleSlideUp 300ms ease-out 300ms forwards;
+}
+
+@keyframes titleSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.splash-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: rgba(212, 215, 221, 0.7);
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: titleSlideUp 300ms ease-out 450ms forwards;
+}
+
+/* ================================
+   LOADING INDICATOR
+   ================================ */
+
+.splash-loader {
+  position: absolute;
+  bottom: 60px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #23C7FF, #D24EFF);
+  opacity: 0.6;
+  animation: loaderBounce 1.4s ease-in-out infinite;
+}
+
+.loader-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loader-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loader-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ================================
+   KEYFRAME ANIMATIONS
+   ================================ */
+
+@keyframes loaderBounce {
+  0%, 100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes nodePulse {
+  0%, 100% {
+    opacity: 0.4;
+    r: 2px;
+  }
+  50% {
+    opacity: 0.8;
+    r: 3px;
+  }
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+
+@media (max-width: 768px) {
+  .orb-container {
+    width: 220px;
+    height: 220px;
+  }
+
+  .glow-orb,
+  .energy-gradient {
+    width: 200px;
+    height: 200px;
+  }
+
+  .logo-x {
+    width: 110px;
+    height: 110px;
+  }
+
+  .splash-title {
+    font-size: 36px;
+    letter-spacing: 1.5px;
+  }
+
+  .splash-subtitle {
+    font-size: 12px;
+  }
+
+  .splash-loader {
+    bottom: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .orb-container {
+    width: 180px;
+    height: 180px;
+  }
+
+  .glow-orb,
+  .energy-gradient {
+    width: 160px;
+    height: 160px;
+  }
+
+  .logo-x {
+    width: 90px;
+    height: 90px;
+  }
+
+  .splash-title {
+    font-size: 28px;
+    letter-spacing: 1px;
+  }
+
+  .splash-subtitle {
+    font-size: 11px;
+  }
+
+  .splash-content {
+    gap: 24px;
+  }
+}
+
+/* ================================
+   TECH NETWORK ANIMATION
+   ================================ */
+
+.particle-container {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #23C7FF, #8A4BFF);
+  box-shadow: 0 0 10px currentColor;
+  animation: particleOrbit 6s linear infinite;
+}
+
+.particle.p1 {
+  background: radial-gradient(circle, #23C7FF, #3BF3F7);
+  animation-delay: 0s;
+  animation-duration: 8s;
+}
+
+.particle.p2 {
+  background: radial-gradient(circle, #3BF3F7, #8A4BFF);
+  animation-delay: 0.5s;
+  animation-duration: 8.5s;
+}
+
+.particle.p3 {
+  background: radial-gradient(circle, #8A4BFF, #D24EFF);
+  animation-delay: 1s;
+  animation-duration: 9s;
+}
+
+.particle.p4 {
+  background: radial-gradient(circle, #D24EFF, #23C7FF);
+  animation-delay: 1.5s;
+  animation-duration: 8s;
+}
+
+.particle.p5 {
+  background: radial-gradient(circle, #23C7FF, #8A4BFF);
+  animation-delay: 2s;
+  animation-duration: 8.5s;
+}
+
+.particle.p6 {
+  background: radial-gradient(circle, #3BF3F7, #D24EFF);
+  animation-delay: 2.5s;
+  animation-duration: 9s;
+}
+
+.particle.p7 {
+  background: radial-gradient(circle, #8A4BFF, #23C7FF);
+  animation-delay: 3s;
+  animation-duration: 8s;
+}
+
+.particle.p8 {
+  background: radial-gradient(circle, #D24EFF, #3BF3F7);
+  animation-delay: 3.5s;
+  animation-duration: 8.5s;
+}
+
+@keyframes particleOrbit {
+  0% {
+    transform: translate(0, -140px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0, -140px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Fade particles on splash exit */
+.splash-screen.splash-exit .particle-container {
+  animation: particleContainerFade 300ms ease-in forwards;
+}
+
+@keyframes particleContainerFade {
   from {
     opacity: 1;
   }
   to {
     opacity: 0;
-    pointer-events: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .splash-logo {
-    font-size: 2.5rem;
-  }
-
-  .splash-loader {
-    width: 40px;
-    height: 40px;
-    border-width: 3px;
   }
 }
