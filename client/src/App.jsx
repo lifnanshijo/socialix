@@ -26,6 +26,18 @@ function App() {
           <AuthProvider>
             <Splash />
             <div className="app">
+              {/* Animated Bubbles Background */}
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              <div className="bubble"></div>
+              
               <Navbar />
               <Routes>
                 <Route path="/login" element={<Login />} />

@@ -8,11 +8,19 @@
   text-align: center;
   padding: 40px;
   margin-bottom: 30px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(51, 102, 255, 0.1), rgba(153, 51, 255, 0.1));
+  border-radius: 16px;
+  border: 1px solid rgba(51, 102, 255, 0.2);
 }
 
 .welcome-section h1 {
   font-size: 32px;
   margin-bottom: 10px;
+  background: linear-gradient(135deg, #00d4ff, #3366ff, #9933ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
 }
 
 .create-post {
@@ -21,17 +29,36 @@
 
 .create-post h3 {
   margin-bottom: 15px;
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 .create-post form {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  padding: 20px;
+  border-radius: 12px;
+  border: none;
+  background: var(--card-background);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .create-post textarea {
   min-height: 100px;
   resize: vertical;
+  border: 2px solid #00d4ff !important;
+  background: var(--card-background);
+  color: var(--text-color);
+  font-size: 15px;
+  line-height: 1.6;
+  transition: all 0.3s ease;
+}
+
+.create-post textarea:focus {
+  outline: none;
+  border-color: #3366ff;
+  box-shadow: 0 0 20px rgba(51, 102, 255, 0.25);
 }
 
 .image-preview {
@@ -77,26 +104,19 @@
 
 .image-upload-btn {
   padding: 10px 20px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.2s ease;
-}
-
-.light-theme .image-upload-btn {
-  background-color: var(--background-light);
-  color: var(--text-light);
-  border: 1px solid var(--border-light);
-}
-
-.dark-theme .image-upload-btn {
-  background-color: var(--background-dark);
-  color: var(--text-dark);
-  border: 1px solid var(--border-dark);
+  background: linear-gradient(135deg, #3366ff, #00d4ff);
+  color: white;
+  border: none;
 }
 
 .image-upload-btn:hover {
-  opacity: 0.8;
+  background: linear-gradient(135deg, #1f4cdb, #00c5e6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(51, 102, 255, 0.3);
 }
 
 .error-message {

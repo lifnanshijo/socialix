@@ -37,7 +37,14 @@ function Splash() {
   return (
     <div className="splash-screen">
       <div className="splash-content">
-        <div className="splash-logo">Social Connect</div>
+        <div className="splash-logo-container">
+          <div className="logo-sx">
+            <span className="logo-s">S</span>
+            <span className="logo-x">X</span>
+          </div>
+        </div>
+        <h1 className="splash-text">Socialix</h1>
+        <p className="splash-subtitle">Social Connect Platform</p>
         <div className="splash-loader"></div>
       </div>
     </div>

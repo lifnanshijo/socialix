@@ -321,6 +321,12 @@ const Chat = () => {
           <div className="no-conversation-selected">
             <h3>Select a conversation</h3>
             <p>Choose from your existing conversations or start a new one</p>
+            <button 
+              className="start-chat-btn"
+              onClick={() => setShowSearch(true)}
+            >
+              + Start New Conversation
+            </button>
           </div>
         )}
       </div>

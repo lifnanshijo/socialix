@@ -5,16 +5,31 @@
 }
 
 :root {
-  --primary-color: #1877f2;
-  --secondary-color: #42b72a;
-  --background-light: #f0f2f5;
-  --background-dark: #18191a;
+  /* Socialix Branding Colors */
+  --primary-cyan: #00d4ff;
+  --primary-blue: #3366ff;
+  --primary-purple: #9933ff;
+  --primary-orange: #ff6633;
+  --primary-gradient: linear-gradient(135deg, #00d4ff, #3366ff, #9933ff, #ff6633);
+  
+  /* Primary colors for UI */
+  --primary-color: #3366ff;
+  --secondary-color: #ff6633;
+  --accent-color: #00d4ff;
+  
+  /* Background colors */
+  --background-light: #f8f9ff;
+  --background-dark: #0f1419;
   --card-light: #ffffff;
-  --card-dark: #242526;
-  --text-light: #050505;
-  --text-dark: #e4e6eb;
-  --border-light: #dddfe2;
-  --border-dark: #3a3b3c;
+  --card-dark: #1a1f2e;
+  
+  /* Text colors */
+  --text-light: #1a1f2e;
+  --text-dark: #f0f2f5;
+  
+  /* Border colors */
+  --border-light: #e0e6ff;
+  --border-dark: #2a3347;
 }
 
 body {
@@ -28,6 +43,8 @@ body {
 
 .app {
   min-height: 100vh;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(51, 102, 255, 0.05) 25%, rgba(153, 51, 255, 0.05) 75%, rgba(255, 102, 51, 0.05) 100%);
+  position: relative;
 }
 
 /* Light Theme */
@@ -81,21 +98,27 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, #3366ff, #9933ff);
   color: white;
+  border: none;
 }
 
 .btn-primary:hover {
-  background-color: #166fe5;
+  background: linear-gradient(135deg, #1f4cdb, #7a1fb8);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(51, 102, 255, 0.4);
 }
 
 .btn-secondary {
-  background-color: var(--secondary-color);
+  background: linear-gradient(135deg, #ff6633, #ff8844);
   color: white;
+  border: none;
 }
 
 .btn-secondary:hover {
-  background-color: #36a420;
+  background: linear-gradient(135deg, #e6522a, #ff7733);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 102, 51, 0.4);
 }
 
 input, textarea {
@@ -204,3 +227,265 @@ input:focus, textarea:focus {
   }
 }
 
+/* ========== Socialix Brand Styling ========== */
+
+/* Focus states for accessibility */
+.btn:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Gradient accent borders */
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #00d4ff, #3366ff, #9933ff, #ff6633);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 0.6;
+}
+
+/* Success and status indicators with gradient */
+.success-message {
+  color: #00d4ff;
+  font-weight: 600;
+}
+
+.error-message {
+  color: #ff6633;
+  font-weight: 600;
+}
+
+.warning-message {
+  color: #ff8844;
+  font-weight: 600;
+}
+
+/* Links with gradient effect */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent-color);
+}
+
+/* Animations */
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-text {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.gradient-border {
+  border: 2px solid;
+  border-image: linear-gradient(135deg, #00d4ff, #3366ff, #9933ff, #ff6633) 1;
+}
+
+/* Smooth transitions throughout app */
+* {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button, a, input[type="submit"] {
+  transition: all 0.2s ease;
+}
+
+/* Animated Bubbles Background */
+.app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bubble {
+  position: fixed;
+  bottom: -150px;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  border: 2px solid;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.15;
+  animation: float-up linear infinite;
+  transform: translateX(-50%);
+}
+
+.bubble:nth-child(1) {
+  width: 80px;
+  height: 80px;
+  left: 10%;
+  animation-duration: 12s;
+  animation-delay: 0s;
+  border-color: #00d4ff;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.bubble:nth-child(2) {
+  width: 60px;
+  height: 60px;
+  left: 20%;
+  animation-duration: 14s;
+  animation-delay: 2s;
+  border-color: #3366ff;
+  box-shadow: 0 0 15px rgba(51, 102, 255, 0.2);
+}
+
+.bubble:nth-child(3) {
+  width: 90px;
+  height: 90px;
+  left: 30%;
+  animation-duration: 16s;
+  animation-delay: 4s;
+  border-color: #9933ff;
+  box-shadow: 0 0 25px rgba(153, 51, 255, 0.2);
+}
+
+.bubble:nth-child(4) {
+  width: 70px;
+  height: 70px;
+  left: 40%;
+  animation-duration: 13s;
+  animation-delay: 1s;
+  border-color: #ff6633;
+  box-shadow: 0 0 20px rgba(255, 102, 51, 0.2);
+}
+
+.bubble:nth-child(5) {
+  width: 85px;
+  height: 85px;
+  left: 50%;
+  animation-duration: 15s;
+  animation-delay: 3s;
+  border-color: #00d4ff;
+  box-shadow: 0 0 22px rgba(0, 212, 255, 0.2);
+}
+
+.bubble:nth-child(6) {
+  width: 65px;
+  height: 65px;
+  left: 60%;
+  animation-duration: 14s;
+  animation-delay: 2s;
+  border-color: #3366ff;
+  box-shadow: 0 0 18px rgba(51, 102, 255, 0.2);
+}
+
+.bubble:nth-child(7) {
+  width: 95px;
+  height: 95px;
+  left: 70%;
+  animation-duration: 17s;
+  animation-delay: 5s;
+  border-color: #9933ff;
+  box-shadow: 0 0 26px rgba(153, 51, 255, 0.2);
+}
+
+.bubble:nth-child(8) {
+  width: 75px;
+  height: 75px;
+  left: 80%;
+  animation-duration: 12s;
+  animation-delay: 1s;
+  border-color: #ff6633;
+  box-shadow: 0 0 21px rgba(255, 102, 51, 0.2);
+}
+
+.bubble:nth-child(9) {
+  width: 55px;
+  height: 55px;
+  left: 90%;
+  animation-duration: 16s;
+  animation-delay: 4s;
+  border-color: #00d4ff;
+  box-shadow: 0 0 17px rgba(0, 212, 255, 0.2);
+}
+
+.bubble:nth-child(10) {
+  width: 88px;
+  height: 88px;
+  left: 15%;
+  animation-duration: 15s;
+  animation-delay: 6s;
+  border-color: #3366ff;
+  box-shadow: 0 0 23px rgba(51, 102, 255, 0.2);
+}
+
+@keyframes float-up {
+  0% {
+    bottom: -150px;
+    opacity: 0;
+    transform: translateX(-50%) translateY(0);
+  }
+  10% {
+    opacity: 0.15;
+  }
+  90% {
+    opacity: 0.15;
+  }
+  100% {
+    bottom: 120vh;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+/* Optional: Add slight horizontal drift to bubbles */
+@keyframes float-up {
+  0% {
+    bottom: -150px;
+    opacity: 0;
+    transform: translateX(-50%) translateY(0);
+  }
+  10% {
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateX(calc(-50% + 20px * sin(1))) translateY(-50vh);
+  }
+  90% {
+    opacity: 0.15;
+  }
+  100% {
+    bottom: 120vh;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}

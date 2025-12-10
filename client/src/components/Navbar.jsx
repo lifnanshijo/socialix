@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { useNotifications } from '../hooks/useNotifications'
 import { NotificationDropdown } from './NotificationDropdown'
+import SocialixLogo from './SocialixLogo'
 import '../styles/navbar.css'
 
 function Navbar() {
@@ -33,7 +34,19 @@ function Navbar() {
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/home" className="navbar-brand" onClick={handleNavClick}>
-            Social Connect
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <SocialixLogo size={32} variant="icon" />
+              <span style={{ 
+                fontSize: '20px', 
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #00d4ff, #3366ff, #9933ff)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Socialix
+              </span>
+            </div>
           </Link>
 
           <div className="navbar-actions">

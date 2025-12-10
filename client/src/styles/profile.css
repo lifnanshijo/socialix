@@ -10,28 +10,22 @@
 
 .cover-image {
   height: 300px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(51, 102, 255, 0.2), rgba(153, 51, 255, 0.2));
   background-size: cover;
   background-position: center;
-  border-radius: 8px 8px 0 0;
+  border-radius: 16px 16px 0 0;
   position: relative;
+  border-bottom: 3px solid;
+  border-image: linear-gradient(90deg, #00d4ff, #3366ff, #9933ff, #ff6633) 1;
 }
 
 .profile-info {
   background: inherit;
   padding: 0 30px 20px;
   position: relative;
-  border-radius: 0 0 8px 8px;
-}
-
-.light-theme .profile-info {
-  background-color: var(--card-light);
-  border: 1px solid var(--border-light);
-  border-top: none;
-}
-
-.dark-theme .profile-info {
-  background-color: var(--card-dark);
-  border: 1px solid var(--border-dark);
+  border-radius: 0 0 16px 16px;
+  border: 2px solid;
+  border-image: linear-gradient(135deg, #00d4ff, #3366ff, #9933ff, #ff6633) 1;
   border-top: none;
 }
 
@@ -41,17 +35,12 @@
   border-radius: 50%;
   background-size: cover;
   background-position: center;
-  border: 4px solid;
+  border: 5px solid;
+  border-color: #00d4ff;
   margin-top: -75px;
   position: relative;
-}
-
-.light-theme .avatar {
-  border-color: var(--card-light);
-}
-
-.dark-theme .avatar {
-  border-color: var(--card-dark);
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.5), 0 0 40px rgba(51, 102, 255, 0.3);
+  overflow: hidden;
 }
 
 .user-details {
@@ -61,6 +50,8 @@
 .user-details h1 {
   font-size: 32px;
   margin-bottom: 10px;
+  color: var(--primary-color);
+  font-weight: 700;
 }
 
 .bio {
