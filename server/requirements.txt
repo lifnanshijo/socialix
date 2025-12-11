@@ -9,4 +9,4 @@ google-auth-oauthlib==1.2.0
 google-auth-httplib2==0.2.0
 apscheduler==3.10.4
 schedule==1.2.0
-
+supabase==2.3.0

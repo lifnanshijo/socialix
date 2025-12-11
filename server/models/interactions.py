@@ -65,7 +65,7 @@ class Comment:
     def find_by_id(comment_id):
         """Find comment by ID"""
         query = """
-            SELECT c.*, u.username, u.avatar, u.avatar_type
+            SELECT c.*, u.username, u.avatar
             FROM comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.id = %s
@@ -77,7 +77,7 @@ class Comment:
     def find_by_post(post_id):
         """Get all comments for a post"""
         query = """
-            SELECT c.*, u.username, u.avatar, u.avatar_type
+            SELECT c.*, u.username, u.avatar
             FROM comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.post_id = %s
@@ -105,16 +105,18 @@ class Comment:
         if not comment:
             return None
         
-        # Get avatar URL
+        # Avatar is now a URL from Supabase (no longer BLOB)
         avatar_url = 'https://via.placeholder.com/40'
         avatar = comment.get('avatar') if isinstance(comment, dict) else getattr(comment, 'avatar', None)
         if avatar:
-            avatar_type = comment.get('avatar_type', 'image/jpeg') if isinstance(comment, dict) else getattr(comment, 'avatar_type', 'image/jpeg')
-            if isinstance(avatar, bytes):
-                avatar_b64 = base64.b64encode(avatar).decode('utf-8')
-                avatar_url = f"data:{avatar_type};base64,{avatar_b64}"
-            else:
+            # Avatar is now a URL string, not BLOB
+            if isinstance(avatar, str):
                 avatar_url = avatar
+            elif isinstance(avatar, bytes):
+                # Legacy support for any remaining BLOB data
+                import base64
+                avatar_b64 = base64.b64encode(avatar).decode('utf-8')
+                avatar_url = f"data:image/jpeg;base64,{avatar_b64}"
         
         created_at = comment['created_at'] if isinstance(comment, dict) else getattr(comment, 'created_at')
         if isinstance(created_at, datetime):

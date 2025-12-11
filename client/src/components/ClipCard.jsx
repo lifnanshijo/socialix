@@ -6,43 +6,6 @@ const API_BASE = 'http://localhost:5000/api'
 export function ClipCard({ clip, isOwner, onDelete }) {
   const [showOptions, setShowOptions] = useState(false)
   const [imageError, setImageError] = useState(false)
-  const [mediaUrl, setMediaUrl] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchMedia = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        const response = await fetch(`${API_BASE}/clips/${clip.clip_id}/download`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-
-        if (!response.ok) {
-          throw new Error('Failed to load media')
-        }
-
-        const blob = await response.blob()
-        const url = URL.createObjectURL(blob)
-        setMediaUrl(url)
-        setLoading(false)
-      } catch (err) {
-        console.error('Error loading media:', err)
-        setImageError(true)
-        setLoading(false)
-      }
-    }
-
-    fetchMedia()
-
-    // Cleanup blob URL on unmount
-    return () => {
-      if (mediaUrl) {
-        URL.revokeObjectURL(mediaUrl)
-      }
-    }
-  }, [clip.clip_id])
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this clip?')) {
@@ -60,11 +23,14 @@ export function ClipCard({ clip, isOwner, onDelete }) {
   }
 
   const fileType = getFileType(clip.file_type)
+  
+  // Use video_url directly (works with both Supabase URLs and base64 data URIs)
+  const mediaUrl = clip.video_url
 
   return (
     <div className="clip-card">
       <div className="clip-media">
-        {loading ? (
+        {!mediaUrl ? (
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -73,7 +39,7 @@ export function ClipCard({ clip, isOwner, onDelete }) {
             height: '100%',
             backgroundColor: '#f0f0f0'
           }}>
-            <p>Loading...</p>
+            <p>No media available</p>
           </div>
         ) : imageError ? (
           <div style={{ 

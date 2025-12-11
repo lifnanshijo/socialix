@@ -5,6 +5,7 @@ Handles all clip-related database operations
 
 from datetime import datetime, timedelta
 from config.database import get_db_connection
+from config.supabase_storage import upload_file_to_supabase, delete_file_from_supabase
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ class Clip:
     @staticmethod
     def create_clip(user_id, file_data, file_name, file_type, file_size, caption=None):
         """
-        Create a new clip in the database with binary file data
+        Create a new clip - Upload to Supabase and store URL
 
         Args:
             user_id (int): ID of the user uploading the clip
@@ -30,6 +31,12 @@ class Clip:
             dict: Clip data with clip_id if successful, None otherwise
         """
         try:
+            # Upload to Supabase
+            video_url = upload_file_to_supabase(file_data, file_type, 'clips')
+            if not video_url:
+                logger.error("Failed to upload clip to Supabase")
+                return None
+            
             conn = get_db_connection()
             cursor = conn.cursor()
 
@@ -38,11 +45,11 @@ class Clip:
             expires_at = created_at + timedelta(hours=24)
 
             query = """
-                INSERT INTO clips (user_id, file_data, file_name, file_type, file_size, caption, created_at, expires_at)
+                INSERT INTO clips (user_id, video_url, file_name, file_type, file_size, caption, created_at, expires_at)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """
 
-            cursor.execute(query, (user_id, file_data, file_name, file_type, file_size, caption, created_at, expires_at))
+            cursor.execute(query, (user_id, video_url, file_name, file_type, file_size, caption, created_at, expires_at))
             conn.commit()
 
             clip_id = cursor.lastrowid
@@ -52,6 +59,7 @@ class Clip:
             return {
                 'clip_id': clip_id,
                 'user_id': user_id,
+                'video_url': video_url,
                 'file_name': file_name,
                 'file_type': file_type,
                 'file_size': file_size,
@@ -83,7 +91,7 @@ class Clip:
             cursor = conn.cursor()
 
             query = """
-                SELECT clip_id, user_id, file_name, file_type, file_size, caption, created_at, expires_at
+                SELECT clip_id, user_id, video_url, file_name, file_type, file_size, caption, created_at, expires_at
                 FROM clips
                 WHERE user_id = %s AND expires_at > NOW() AND is_deleted = FALSE
                 ORDER BY created_at DESC
@@ -97,13 +105,13 @@ class Clip:
                 result.append({
                     'clip_id': clip[0],
                     'user_id': clip[1],
-                    'file_name': clip[2],
-                    'file_type': clip[3],
-                    'file_size': clip[4],
-                    'caption': clip[5],
-                    'created_at': clip[6].isoformat(),
-                    'expires_at': clip[7].isoformat(),
-                    'file_url': f'/api/clips/{clip[0]}/download'
+                    'video_url': clip[2],
+                    'file_name': clip[3],
+                    'file_type': clip[4],
+                    'file_size': clip[5],
+                    'caption': clip[6],
+                    'created_at': clip[7].isoformat(),
+                    'expires_at': clip[8].isoformat()
                 })
 
             logger.info(f"Retrieved {len(result)} active clips for user_id={user_id}")
@@ -132,7 +140,7 @@ class Clip:
             cursor = conn.cursor()
 
             query = """
-                SELECT c.clip_id, c.user_id, c.file_name, c.file_type, c.file_size, c.caption, c.created_at, c.expires_at, u.username
+                SELECT c.clip_id, c.user_id, c.video_url, c.file_name, c.file_type, c.file_size, c.caption, c.created_at, c.expires_at, u.username
                 FROM clips c
                 INNER JOIN followers f ON c.user_id = f.following_id
                 INNER JOIN users u ON c.user_id = u.id
@@ -148,14 +156,14 @@ class Clip:
                 result.append({
                     'clip_id': clip[0],
                     'user_id': clip[1],
-                    'file_name': clip[2],
-                    'file_type': clip[3],
-                    'file_size': clip[4],
-                    'caption': clip[5],
-                    'created_at': clip[6].isoformat(),
-                    'expires_at': clip[7].isoformat(),
-                    'uploaded_by': clip[8],
-                    'file_url': f'/api/clips/{clip[0]}/download'
+                    'video_url': clip[2],
+                    'file_name': clip[3],
+                    'file_type': clip[4],
+                    'file_size': clip[5],
+                    'caption': clip[6],
+                    'created_at': clip[7].isoformat(),
+                    'expires_at': clip[8].isoformat(),
+                    'uploaded_by': clip[9]
                 })
 
             logger.info(f"Retrieved {len(result)} clips from followed users for user_id={user_id}")

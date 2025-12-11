@@ -1,4 +1,5 @@
 from config.database import execute_query
+from config.supabase_storage import upload_file_to_supabase, delete_file_from_supabase
 import bcrypt
 from datetime import datetime
 import base64
@@ -53,9 +54,12 @@ class User:
 
     @staticmethod
     def update_profile(user_id, username=None, bio=None, avatar=None, avatar_type=None, cover_image=None, cover_image_type=None):
-        """Update user profile with BLOB images"""
+        """Update user profile - Upload images to Supabase or fallback to base64"""
         updates = []
         params = []
+        
+        # Get current user to delete old files if needed
+        current_user = User.find_by_id(user_id)
         
         if username is not None and username != '':
             updates.append("username = %s")
@@ -63,18 +67,30 @@ class User:
         if bio is not None:
             updates.append("bio = %s")
             params.append(bio)
+            
+        # Handle avatar upload to Supabase
         if avatar is not None:
-            updates.append("avatar = %s")
-            params.append(avatar)
-        if avatar_type is not None:
-            updates.append("avatar_type = %s")
-            params.append(avatar_type)
+            # Delete old avatar from Supabase if exists
+            if current_user and current_user.get('avatar') and current_user.get('avatar').startswith('http'):
+                delete_file_from_supabase(current_user.get('avatar'))
+            
+            # Upload new avatar to Supabase
+            avatar_url = upload_file_to_supabase(avatar, avatar_type, 'avatars')
+            if avatar_url:
+                updates.append("avatar = %s")
+                params.append(avatar_url)
+        
+        # Handle cover image upload to Supabase
         if cover_image is not None:
-            updates.append("cover_image = %s")
-            params.append(cover_image)
-        if cover_image_type is not None:
-            updates.append("cover_image_type = %s")
-            params.append(cover_image_type)
+            # Delete old cover image from Supabase if exists
+            if current_user and current_user.get('cover_image') and current_user.get('cover_image').startswith('http'):
+                delete_file_from_supabase(current_user.get('cover_image'))
+            
+            # Upload new cover image to Supabase
+            cover_url = upload_file_to_supabase(cover_image, cover_image_type, 'covers')
+            if cover_url:
+                updates.append("cover_image = %s")
+                params.append(cover_url)
         
         if not updates:
             return User.find_by_id(user_id)
@@ -90,40 +106,9 @@ class User:
         if not user:
             return None
         
-        # Convert BLOB images to base64 for JSON serialization
-        avatar_data = None
-        if user.get('avatar'):
-            avatar_type = user.get('avatar_type') or 'image/jpeg'
-            avatar_bytes = user.get('avatar')
-            if avatar_bytes:
-                try:
-                    if isinstance(avatar_bytes, bytes):
-                        avatar_b64 = base64.b64encode(avatar_bytes).decode('utf-8')
-                        avatar_data = f"data:{avatar_type};base64,{avatar_b64}"
-                    elif isinstance(avatar_bytes, str) and avatar_bytes.startswith('data:'):
-                        avatar_data = avatar_bytes
-                    else:
-                        avatar_data = None
-                except Exception as e:
-                    print(f"Error encoding avatar: {e}")
-                    avatar_data = None
-        
-        cover_image_data = None
-        if user.get('cover_image'):
-            cover_type = user.get('cover_image_type') or 'image/jpeg'
-            cover_bytes = user.get('cover_image')
-            if cover_bytes:
-                try:
-                    if isinstance(cover_bytes, bytes):
-                        cover_b64 = base64.b64encode(cover_bytes).decode('utf-8')
-                        cover_image_data = f"data:{cover_type};base64,{cover_b64}"
-                    elif isinstance(cover_bytes, str) and cover_bytes.startswith('data:'):
-                        cover_image_data = cover_bytes
-                    else:
-                        cover_image_data = None
-                except Exception as e:
-                    print(f"Error encoding cover_image: {e}")
-                    cover_image_data = None
+        # Avatar and cover_image are now URLs from Supabase
+        avatar_data = user.get('avatar') if user.get('avatar') else None
+        cover_image_data = user.get('cover_image') if user.get('cover_image') else None
         
         return {
             'id': user['id'],
@@ -132,8 +117,6 @@ class User:
             'bio': user.get('bio'),
             'avatar': avatar_data,
             'cover_image': cover_image_data,
-            'avatar_type': user.get('avatar_type'),
-            'cover_image_type': user.get('cover_image_type'),
             'created_at': user['created_at'].isoformat() if isinstance(user['created_at'], datetime) else user['created_at'],
             'updated_at': user.get('updated_at').isoformat() if isinstance(user.get('updated_at'), datetime) else user.get('updated_at')
         }
