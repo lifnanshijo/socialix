@@ -31,6 +31,20 @@ export function NotificationDropdown({ show, onClose }) {
       navigate('/chat')
     } else if (notification.type === 'follow') {
       navigate(`/profile/${notification.sender_id}`)
+    } else if (notification.type === 'like' || notification.type === 'comment') {
+      // Navigate to home page where the post is visible
+      navigate('/home')
+      // Optionally scroll to the specific post if reference_id is available
+      if (notification.reference_id) {
+        setTimeout(() => {
+          const postElement = document.getElementById(`post-${notification.reference_id}`)
+          if (postElement) {
+            postElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            postElement.classList.add('highlight-post')
+            setTimeout(() => postElement.classList.remove('highlight-post'), 2000)
+          }
+        }, 500)
+      }
     }
     
     onClose()
@@ -113,6 +127,18 @@ export function NotificationDropdown({ show, onClose }) {
                         {notification.type === 'comment' && ' commented on your post'}
                       </span>
                     </div>
+                    {notification.content && notification.type === 'comment' && (
+                      <div className="notification-preview" style={{
+                        fontSize: '0.85rem',
+                        color: 'var(--text-secondary)',
+                        marginTop: '0.25rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {notification.content}
+                      </div>
+                    )}
                     <div className="notification-time">
                       {formatTime(notification.created_at)}
                     </div>

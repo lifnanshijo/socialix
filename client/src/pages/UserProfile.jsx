@@ -23,6 +23,10 @@ const UserProfile = () => {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [loadingFollowers, setLoadingFollowers] = useState(false);
+  const [postLikes, setPostLikes] = useState({});
+  const [postComments, setPostComments] = useState({});
+  const [expandedComments, setExpandedComments] = useState({});
+  const [commentText, setCommentText] = useState({});
 
   const API_BASE = 'http://localhost:5000/api';
 
@@ -168,6 +172,90 @@ const UserProfile = () => {
 
   const isOwnProfile = currentUser && user && currentUser.id === user.id;
 
+  // Fetch likes and comments for posts
+  const fetchPostLikes = async (postId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_BASE}/posts/${postId}/likes`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPostLikes(prev => ({
+        ...prev,
+        [postId]: {
+          count: response.data.likes?.length || 0,
+          userLiked: response.data.user_liked || false
+        }
+      }));
+    } catch (error) {
+      console.error('Error fetching likes:', error);
+    }
+  };
+
+  const fetchPostComments = async (postId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_BASE}/posts/${postId}/comments`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPostComments(prev => ({
+        ...prev,
+        [postId]: response.data.comments || []
+      }));
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
+  const handleLike = async (postId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const userLiked = postLikes[postId]?.userLiked;
+      
+      if (userLiked) {
+        await axios.delete(`${API_BASE}/posts/${postId}/like`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } else {
+        await axios.post(`${API_BASE}/posts/${postId}/like`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+      
+      // Refresh likes
+      await fetchPostLikes(postId);
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
+
+  const handleComment = async (postId) => {
+    if (!commentText[postId]?.trim()) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${API_BASE}/posts/${postId}/comments`, 
+        { content: commentText[postId] },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setCommentText(prev => ({ ...prev, [postId]: '' }));
+      await fetchPostComments(postId);
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+
+  const toggleComments = (postId) => {
+    setExpandedComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+    
+    if (!expandedComments[postId] && !postComments[postId]) {
+      fetchPostComments(postId);
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading profile...</div>;
   }
@@ -269,30 +357,106 @@ const UserProfile = () => {
               {posts.length === 0 ? (
                 <p className="no-posts">No posts yet</p>
               ) : (
-                posts.map((post) => (
-                  <div key={post.id} className="post-card">
-                    {post.imageUrl && (
-                      <img 
-                        src={post.imageUrl} 
-                        alt="Post" 
-                        className="post-image"
-                      />
-                    )}
-                    {post.videoUrl && (
-                      <video 
-                        src={post.videoUrl} 
-                        controls 
-                        className="post-image"
-                      />
-                    )}
-                    {post.content && (
-                      <p className="post-content">{post.content}</p>
-                    )}
-                    <div className="post-meta">
-                      <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                posts.map((post) => {
+                  const likes = postLikes[post.id] || { count: 0, userLiked: false };
+                  const comments = postComments[post.id] || [];
+                  const isExpanded = expandedComments[post.id] || false;
+                  
+                  // Fetch likes when post is rendered
+                  if (!postLikes[post.id]) {
+                    fetchPostLikes(post.id);
+                  }
+                  
+                  return (
+                    <div key={post.id} className="post-card">
+                      {post.imageUrl && (
+                        <img 
+                          src={post.imageUrl} 
+                          alt="Post" 
+                          className="post-image"
+                        />
+                      )}
+                      {post.videoUrl && (
+                        <video 
+                          src={post.videoUrl} 
+                          controls 
+                          className="post-image"
+                        />
+                      )}
+                      {post.content && (
+                        <p className="post-content">{post.content}</p>
+                      )}
+                      <div className="post-meta">
+                        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                        <div className="post-actions">
+                          <button 
+                            className={`action-btn ${likes.userLiked ? 'liked' : ''}`}
+                            onClick={() => handleLike(post.id)}
+                          >
+                            <span className="icon">❤️</span>
+                            <span>{likes.count}</span>
+                          </button>
+                          <button 
+                            className="action-btn"
+                            onClick={() => toggleComments(post.id)}
+                          >
+                            <span className="icon">💬</span>
+                            <span>{comments.length}</span>
+                          </button>
+                          <button 
+                            className="action-btn"
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
+                              alert('Link copied to clipboard!');
+                            }}
+                          >
+                            <span className="icon">🔗</span>
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {isExpanded && (
+                        <div className="comments-section">
+                          <div className="comments-list">
+                            {comments.map((comment) => (
+                              <div key={comment.id} className="comment">
+                                <div className="comment-header">
+                                  <span className="comment-author">{comment.username}</span>
+                                  <span className="comment-date">
+                                    {new Date(comment.createdAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <p className="comment-content">{comment.content}</p>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="comment-input">
+                            <input
+                              type="text"
+                              placeholder="Add a comment..."
+                              value={commentText[post.id] || ''}
+                              onChange={(e) => setCommentText(prev => ({
+                                ...prev,
+                                [post.id]: e.target.value
+                              }))}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  handleComment(post.id);
+                                }
+                              }}
+                            />
+                            <button 
+                              className="btn btn-primary btn-sm"
+                              onClick={() => handleComment(post.id)}
+                            >
+                              Post
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}

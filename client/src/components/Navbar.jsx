@@ -3,8 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { useNotifications } from '../hooks/useNotifications'
-import { NotificationDropdown } from './NotificationDropdown'
-import { Home, Search, MessageSquare, Camera, User, Moon, Sun, LogOut, LogIn, Menu, X } from 'lucide-react'
+import { Home, Search, MessageSquare, Camera, User, Moon, Sun, LogOut, LogIn, Menu, X, Bell } from 'lucide-react'
 import '../styles/navbar.css'
 import '../styles/sidebar.css'
 
@@ -14,7 +13,6 @@ function Navbar() {
   const { unreadCount } = useNotifications()
   const navigate = useNavigate()
   const location = useLocation()
-  const [showNotifications, setShowNotifications] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleLogout = () => {
@@ -126,6 +124,22 @@ function Navbar() {
                 >
                   <Camera size={20} strokeWidth={2} />
                 </Link>
+                <Link 
+                  to="/notifications" 
+                  className={`flex items-center justify-center w-11 h-11 rounded-lg transition-all duration-200 relative ${
+                    isActive('/notifications') 
+                      ? 'text-cyan-400 shadow-lg shadow-cyan-500/50' 
+                      : 'text-gray-400 hover:text-cyan-400'
+                  }`}
+                  title="Notifications"
+                >
+                  <Bell size={20} strokeWidth={2} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </Link>
               </div>
             )}
             {!user && (
@@ -198,6 +212,23 @@ function Navbar() {
             <span>Stories</span>
           </Link>
 
+          <Link
+            to="/notifications"
+            className={`sidebar-item ${isActive('/notifications') ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+            title="Notifications"
+          >
+            <div className="relative inline-block">
+              <Bell size={20} strokeWidth={2} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center" style={{fontSize: '10px'}}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
+            <span>Notifications {unreadCount > 0 && `(${unreadCount})`}</span>
+          </Link>
+
           {user && (
             <Link
               to="/profile"
@@ -259,11 +290,6 @@ function Navbar() {
           )}
         </div>
       </aside>
-
-      <NotificationDropdown 
-        show={showNotifications} 
-        onClose={() => setShowNotifications(false)} 
-      />
     </>
   )
 }

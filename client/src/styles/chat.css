@@ -433,7 +433,7 @@
 .start-chat-btn:active {
   transform: translateY(0);
 }
-}
+
 
 /* Scrollbar Styling */
 .conversations-list::-webkit-scrollbar,

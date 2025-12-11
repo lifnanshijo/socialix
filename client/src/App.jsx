@@ -11,6 +11,7 @@ import Home from './pages/Home'
 import Chat from './pages/Chat'
 import Search from './pages/Search'
 import Clips from './pages/Clips'
+import Notifications from './pages/Notifications'
 import UserProfile from './pages/UserProfile'
 import ColorPalette from './components/ColorPalette'
 import ColorSystemPalette from './components/ColorSystemPalette'
@@ -67,6 +68,11 @@ function App() {
                   <Route path="/clips" element={
                     <PrivateRoute>
                       <Clips />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/notifications" element={
+                    <PrivateRoute>
+                      <Notifications />
                     </PrivateRoute>
                   } />
                   <Route path="/colors" element={<ColorPalette />} />

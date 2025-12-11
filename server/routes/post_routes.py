@@ -3,6 +3,7 @@ from flask_jwt_extended import get_jwt_identity
 from models.post import Post
 from models.user import User
 from models.interactions import Like, Comment
+from models.notification import Notification
 from middleware.auth import token_required
 import mimetypes
 
@@ -303,6 +304,18 @@ def like_post(post_id):
         if not success:
             return jsonify({'message': 'Already liked'}), 400
         
+        # Create notification for post owner (if not liking own post)
+        if post['user_id'] != user_id:
+            current_user = User.find_by_id(user_id)
+            if current_user:
+                Notification.create_notification(
+                    user_id=post['user_id'],
+                    sender_id=user_id,
+                    notification_type='like',
+                    content=f"{current_user['username']} liked your post",
+                    reference_id=post_id
+                )
+        
         like_count = Like.get_like_count(post_id)
         
         return jsonify({
@@ -375,6 +388,18 @@ def add_comment(post_id):
         
         if not comment:
             return jsonify({'message': 'Failed to create comment'}), 500
+        
+        # Create notification for post owner (if not commenting on own post)
+        if post['user_id'] != user_id:
+            current_user = User.find_by_id(user_id)
+            if current_user:
+                Notification.create_notification(
+                    user_id=post['user_id'],
+                    sender_id=user_id,
+                    notification_type='comment',
+                    content=f"{current_user['username']} commented on your post",
+                    reference_id=post_id
+                )
         
         return jsonify(Comment.to_dict(comment)), 201
     except Exception as e:

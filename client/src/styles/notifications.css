@@ -166,6 +166,22 @@
   color: #e41e3f;
 }
 
+/* Highlight post when navigated from notification */
+.highlight-post {
+  animation: highlightPulse 2s ease-in-out;
+  border: 2px solid var(--primary-color) !important;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3) !important;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+  }
+}
+
 @media (max-width: 768px) {
   .notification-dropdown {
     top: 60px;

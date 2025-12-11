@@ -291,7 +291,7 @@ function Home() {
             </div>
           ) : (
             posts.map(post => (
-              <div key={post.id} className="post-card card">
+              <div key={post.id} id={`post-${post.id}`} className="post-card card">
                 <div className="post-header">
                   <img 
                     src={post.user?.avatar || 'https://via.placeholder.com/50'} 
