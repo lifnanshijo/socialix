@@ -67,6 +67,8 @@ class Chat:
                 m.conversation_id,
                 m.sender_id,
                 m.content,
+                m.message_type,
+                m.media_url,
                 m.created_at,
                 u.username as sender_username
             FROM messages m
@@ -78,13 +80,13 @@ class Chat:
         return execute_query(query, (conversation_id, limit), fetch=True)
     
     @staticmethod
-    def send_message(conversation_id, sender_id, content):
+    def send_message(conversation_id, sender_id, content=None, message_type='text', media_url=None):
         """Send a message in a conversation"""
         query = """
-            INSERT INTO messages (conversation_id, sender_id, content) 
-            VALUES (%s, %s, %s)
+            INSERT INTO messages (conversation_id, sender_id, content, message_type, media_url) 
+            VALUES (%s, %s, %s, %s, %s)
         """
-        result = execute_query(query, (conversation_id, sender_id, content), commit=True)
+        result = execute_query(query, (conversation_id, sender_id, content, message_type, media_url), commit=True)
         
         # Update conversation timestamp
         update_query = "UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = %s"

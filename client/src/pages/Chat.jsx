@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import VoiceRecorder from '../components/VoiceRecorder';
 import '../styles/chat.css';
 
 const Chat = () => {
@@ -14,7 +15,11 @@ const Chat = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const API_BASE = 'http://localhost:5000/api';
 
@@ -77,22 +82,103 @@ const Chat = () => {
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation) return;
+    if ((!newMessage.trim() && !selectedImage) || !selectedConversation) return;
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post(
-        `${API_BASE}/chat/conversations/${selectedConversation.id}/messages`,
-        { content: newMessage },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      setNewMessage('');
-      fetchMessages(selectedConversation.id);
-      fetchConversations(); // Update conversation list with new message
+      
+      // Send image message
+      if (selectedImage) {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64Data = reader.result;
+          await axios.post(
+            `${API_BASE}/chat/conversations/${selectedConversation.id}/messages`,
+            { 
+              content: newMessage.trim() || null,
+              message_type: 'image',
+              media_data: base64Data,
+              file_type: selectedImage.type
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          setNewMessage('');
+          setSelectedImage(null);
+          setImagePreview(null);
+          fetchMessages(selectedConversation.id);
+          fetchConversations();
+        };
+        reader.readAsDataURL(selectedImage);
+      } else {
+        // Send text message
+        await axios.post(
+          `${API_BASE}/chat/conversations/${selectedConversation.id}/messages`,
+          { content: newMessage, message_type: 'text' },
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        setNewMessage('');
+        fetchMessages(selectedConversation.id);
+        fetchConversations();
+      }
     } catch (error) {
       console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    }
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert('Image size should be less than 5MB');
+        return;
+      }
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleVoiceRecordingComplete = async (audioBlob) => {
+    if (!selectedConversation) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const reader = new FileReader();
+      
+      reader.onloadend = async () => {
+        const base64Data = reader.result;
+        await axios.post(
+          `${API_BASE}/chat/conversations/${selectedConversation.id}/messages`,
+          { 
+            message_type: 'voice',
+            media_data: base64Data,
+            file_type: 'audio/webm'
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        setShowVoiceRecorder(false);
+        fetchMessages(selectedConversation.id);
+        fetchConversations();
+      };
+      
+      reader.readAsDataURL(audioBlob);
+    } catch (error) {
+      console.error('Error sending voice message:', error);
+      alert('Failed to send voice message. Please try again.');
     }
   };
 
@@ -294,7 +380,26 @@ const Chat = () => {
                     {msg.sender_id !== user.id && (
                       <div className="message-sender">{msg.sender_username}</div>
                     )}
-                    <div className="message-text">{msg.content}</div>
+                    
+                    {/* Render based on message type */}
+                    {msg.message_type === 'image' && msg.media_url && (
+                      <div className="message-image">
+                        <img src={msg.media_url} alt="Shared image" />
+                      </div>
+                    )}
+                    
+                    {msg.message_type === 'voice' && msg.media_url && (
+                      <div className="message-voice">
+                        <audio controls src={msg.media_url}>
+                          Your browser does not support the audio element.
+                        </audio>
+                      </div>
+                    )}
+                    
+                    {msg.content && (
+                      <div className="message-text">{msg.content}</div>
+                    )}
+                    
                     <div className="message-time">
                       {formatTime(msg.created_at)}
                     </div>
@@ -304,7 +409,53 @@ const Chat = () => {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Voice Recorder */}
+            {showVoiceRecorder && (
+              <VoiceRecorder
+                onRecordingComplete={handleVoiceRecordingComplete}
+                onCancel={() => setShowVoiceRecorder(false)}
+              />
+            )}
+
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="image-preview-container">
+                <div className="image-preview">
+                  <img src={imagePreview} alt="Preview" />
+                  <button className="remove-image-btn" onClick={removeImage}>
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
             <form className="message-input-form" onSubmit={sendMessage}>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleImageSelect}
+              />
+              
+              <button
+                type="button"
+                className="attach-btn"
+                onClick={() => fileInputRef.current?.click()}
+                title="Send image"
+              >
+                📷
+              </button>
+              
+              <button
+                type="button"
+                className="voice-btn"
+                onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+                title="Record voice message"
+              >
+                🎤
+              </button>
+              
               <input
                 type="text"
                 placeholder="Type a message..."
@@ -312,7 +463,8 @@ const Chat = () => {
                 onChange={(e) => setNewMessage(e.target.value)}
                 className="message-input"
               />
-              <button type="submit" className="send-btn">
+              
+              <button type="submit" className="send-btn" disabled={!newMessage.trim() && !selectedImage}>
                 Send
               </button>
             </form>
