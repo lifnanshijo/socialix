@@ -211,12 +211,18 @@ def execute_query(query, params=None, fetch=False, commit=False):
         cursor.execute(query, params or ())
         if fetch:
             result = cursor.fetchall()
-            # Convert any bytes to strings in the result
+            # Convert any bytes to strings in the result (only if valid UTF-8)
             if result:
                 for row in result:
                     for key, value in row.items():
                         if isinstance(value, bytes):
-                            row[key] = value.decode('utf-8')
+                            try:
+                                # Try to decode as UTF-8 text
+                                row[key] = value.decode('utf-8')
+                            except UnicodeDecodeError:
+                                # If it fails, it's binary data (image, etc.) - leave as bytes
+                                # This will be handled by the model's to_dict method
+                                pass
             return result
         else:
             if commit or not fetch:

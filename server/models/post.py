@@ -155,7 +155,26 @@ class Post:
                 if value is None:
                     return None
                 if isinstance(value, bytes):
-                    return value.decode('utf-8')
+                    try:
+                        # Try to decode as UTF-8 text (for URLs or text data)
+                        return value.decode('utf-8')
+                    except UnicodeDecodeError:
+                        # If it fails, it's binary data - convert to base64 data URI
+                        import base64
+                        # Detect media type from magic bytes
+                        if value.startswith(b'\x89PNG'):
+                            mime_type = 'image/png'
+                        elif value.startswith(b'\xff\xd8\xff'):
+                            mime_type = 'image/jpeg'
+                        elif value.startswith(b'GIF'):
+                            mime_type = 'image/gif'
+                        elif value.startswith(b'RIFF') and b'WEBP' in value[:12]:
+                            mime_type = 'image/webp'
+                        else:
+                            mime_type = 'application/octet-stream'
+                        
+                        base64_data = base64.b64encode(value).decode('utf-8')
+                        return f"data:{mime_type};base64,{base64_data}"
                 return value
             
             # Image and video are now URLs from Supabase

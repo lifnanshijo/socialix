@@ -1,12 +1,21 @@
-# TEAM FIX: "Object of type bytes is not JSON serializable" Error
+# TEAM FIX: Bytes Encoding Errors (JSON serializable & UTF-8 decode)
 
-## 🐛 Problem
-When logging in or fetching user data, you may see this error:
+## 🐛 Problems You May See
+
+**Error 1:**
 ```
 Object of type bytes is not JSON serializable
 ```
 
-This happens because MySQL returns TEXT/MEDIUMTEXT fields as bytes, and Flask's `jsonify()` cannot convert bytes to JSON.
+**Error 2:**
+```
+'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte
+```
+
+These happen because:
+1. MySQL returns TEXT/MEDIUMTEXT fields as bytes
+2. Some users have binary image data (PNG/JPEG) stored in the database
+3. Flask's `jsonify()` cannot serialize bytes, and you can't decode binary images as UTF-8 text
 
 ## ✅ Solution - Apply These 3 Changes
 
@@ -26,12 +35,18 @@ def execute_query(query, params=None, fetch=False, commit=False):
         cursor.execute(query, params or ())
         if fetch:
             result = cursor.fetchall()
-            # Convert any bytes to strings in the result
+            # Convert any bytes to strings in the result (only if valid UTF-8)
             if result:
                 for row in result:
                     for key, value in row.items():
                         if isinstance(value, bytes):
-                            row[key] = value.decode('utf-8')
+                            try:
+                                # Try to decode as UTF-8 text
+                                row[key] = value.decode('utf-8')
+                            except UnicodeDecodeError:
+                                # If it fails, it's binary data (image, etc.) - leave as bytes
+                                # This will be handled by the model's to_dict method
+                                pass
             return result
         else:
             if commit or not fetch:
@@ -46,7 +61,7 @@ def execute_query(query, params=None, fetch=False, commit=False):
         connection.close()
 ```
 
-**What changed:** Added automatic bytes-to-string conversion in the result processing.
+**What changed:** Added smart bytes-to-string conversion that only decodes valid UTF-8 text, skips binary data.
 
 ---
 
@@ -66,10 +81,29 @@ Find the `to_dict` method (around line 104) and replace it with:
             if value is None:
                 return None
             if isinstance(value, bytes):
-                return value.decode('utf-8')
+                try:
+                    # Try to decode as UTF-8 text (for URLs or text data)
+                    return value.decode('utf-8')
+                except UnicodeDecodeError:
+                    # If it fails, it's binary image data - convert to base64 data URI
+                    import base64
+                    # Detect image type from magic bytes
+                    if value.startswith(b'\x89PNG'):
+                        mime_type = 'image/png'
+                    elif value.startswith(b'\xff\xd8\xff'):
+                        mime_type = 'image/jpeg'
+                    elif value.startswith(b'GIF'):
+                        mime_type = 'image/gif'
+                    elif value.startswith(b'RIFF') and b'WEBP' in value[:12]:
+                        mime_type = 'image/webp'
+                    else:
+                        mime_type = 'image/jpeg'  # default
+                    
+                    base64_data = base64.b64encode(value).decode('utf-8')
+                    return f"data:{mime_type};base64,{base64_data}"
             return value
         
-        # Avatar and cover_image are now URLs from Supabase
+        # Avatar and cover_image are now URLs from Supabase (or base64 fallback)
         avatar_data = safe_decode(user.get('avatar'))
         cover_image_data = safe_decode(user.get('cover_image'))
         bio_data = safe_decode(user.get('bio'))
@@ -86,7 +120,7 @@ Find the `to_dict` method (around line 104) and replace it with:
         }
 ```
 
-**What changed:** Added `safe_decode()` helper to convert bytes to strings for avatar, cover_image, and bio fields.
+**What changed:** `safe_decode()` now handles binary images by converting them to base64 data URIs if UTF-8 decode fails.
 
 ---
 
@@ -113,10 +147,29 @@ Find the `to_dict` method (around line 141) and replace the entire method with:
                 if value is None:
                     return None
                 if isinstance(value, bytes):
-                    return value.decode('utf-8')
+                    try:
+                        # Try to decode as UTF-8 text (for URLs or text data)
+                        return value.decode('utf-8')
+                    except UnicodeDecodeError:
+                        # If it fails, it's binary data - convert to base64 data URI
+                        import base64
+                        # Detect media type from magic bytes
+                        if value.startswith(b'\x89PNG'):
+                            mime_type = 'image/png'
+                        elif value.startswith(b'\xff\xd8\xff'):
+                            mime_type = 'image/jpeg'
+                        elif value.startswith(b'GIF'):
+                            mime_type = 'image/gif'
+                        elif value.startswith(b'RIFF') and b'WEBP' in value[:12]:
+                            mime_type = 'image/webp'
+                        else:
+                            mime_type = 'application/octet-stream'
+                        
+                        base64_data = base64.b64encode(value).decode('utf-8')
+                        return f"data:{mime_type};base64,{base64_data}"
                 return value
             
-            # Image and video are now URLs from Supabase
+            # Image and video are now URLs from Supabase (or base64 fallback)
             image_url = safe_decode(safe_get(post, 'image_url'))
             video_url = safe_decode(safe_get(post, 'video_url'))
             content = safe_decode(safe_get(post, 'content'))
@@ -149,7 +202,7 @@ Find the `to_dict` method (around line 141) and replace the entire method with:
             raise
 ```
 
-**What changed:** Added `safe_decode()` helper for content, image_url, and video_url fields.
+**What changed:** `safe_decode()` now handles binary media by converting to base64 data URIs if UTF-8 decode fails.
 
 ---
 
@@ -168,15 +221,26 @@ You should see user data in JSON format without errors.
 
 ## 📝 Summary
 
-**Root Cause:** MySQL connector returns TEXT fields as bytes in some configurations.
+**Root Causes:** 
+1. MySQL connector returns TEXT fields as bytes
+2. Some users have binary image data (PNG/JPEG) stored in database
+3. You can't decode binary images as UTF-8 text
 
-**Solution:** Convert bytes to strings at two levels:
-1. Database layer (`execute_query`) - catches all text fields
-2. Model layer (`to_dict` methods) - extra safety for serialization
+**Solution Approach:**
+1. **Database layer**: Try to decode bytes as UTF-8, skip if it fails (leave as bytes)
+2. **Model layer**: Try UTF-8 decode first, fallback to base64 data URI for binary images
+3. This allows both URL strings AND legacy binary images to work
+
+**What Gets Converted:**
+- ✅ Supabase URLs (text) → Decoded as UTF-8 strings
+- ✅ Legacy binary images → Converted to base64 data URIs
+- ✅ Text content → Decoded as UTF-8 strings
+- ✅ NULL values → Remain as None/null
 
 **Files Modified:**
-- `server/config/database.py` - 1 function
-- `server/models/user.py` - 1 method
-- `server/models/post.py` - 1 method
+- `server/config/database.py` - 1 function (execute_query)
+- `server/models/user.py` - 1 method (to_dict)
+- `server/models/post.py` - 1 method (to_dict)
 
-After applying these changes, restart your Flask server and login should work without errors! 🎉
+After applying these changes, **restart your Flask server** and both errors should be fixed! 🎉
+
