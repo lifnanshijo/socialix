@@ -244,3 +244,84 @@ You should see user data in JSON format without errors.
 
 After applying these changes, **restart your Flask server** and both errors should be fixed! 🎉
 
+---
+
+## ⚠️ Additional Common Errors
+
+### Error 3: "Unknown column 'video_url' in 'field list'"
+
+This happens if your posts table is missing the video_url column (older database).
+
+**Fix:** Run this SQL command:
+
+```sql
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS video_url MEDIUMTEXT AFTER image_url;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS media_type ENUM('text', 'image', 'video') DEFAULT 'text';
+```
+
+Or use Python:
+
+```bash
+cd server
+python -c "from config.database import execute_query; execute_query('ALTER TABLE posts ADD COLUMN video_url MEDIUMTEXT AFTER image_url', commit=True); execute_query('ALTER TABLE posts ADD COLUMN media_type ENUM(\\'text\\', \\'image\\', \\'video\\') DEFAULT \\'text\\'', commit=True); print('Posts table updated!')"
+```
+
+### Error 4: "Failed to send message" in Chat
+
+This happens if the messages table is missing media columns or if Supabase upload fails.
+
+**Fix 1:** Update messages table schema:
+
+```bash
+cd server
+python -c "from config.database import execute_query; execute_query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS message_type ENUM(\\'text\\', \\'image\\', \\'voice\\') DEFAULT \\'text\\'', commit=True); execute_query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS media_url VARCHAR(500)', commit=True); execute_query('ALTER TABLE messages MODIFY content TEXT NULL', commit=True); print('Messages table updated!')"
+```
+
+**Fix 2:** Check error in browser console (F12) and server terminal for more details.
+
+Common causes:
+- Supabase credentials not configured (check server/.env)
+- File size too large (>5MB for images)
+- Network/CORS issues
+- Microphone permission denied (for voice messages)
+
+**Fix 3:** Verify Supabase bucket exists:
+
+1. Go to Supabase Dashboard → Storage
+2. Create a public bucket named `socialx` if it doesn't exist
+3. Make sure bucket is **public** (not private)
+4. Check bucket policies allow uploads
+
+**Fix 4:** Test Supabase connection:
+
+```bash
+cd server
+python -c "from config.supabase_storage import upload_file_to_supabase; test_data = b'test'; result = upload_file_to_supabase(test_data, 'text/plain', 'test'); print('Upload test:', 'SUCCESS' if result else 'FAILED'); print('URL:', result)"
+```
+
+---
+
+## 🔍 Quick Diagnostics
+
+**Check if your database is up to date:**
+
+```bash
+cd server
+python -c "from config.database import execute_query; posts = execute_query('DESCRIBE posts', fetch=True); msgs = execute_query('DESCRIBE messages', fetch=True); print('Posts columns:', [r['Field'] for r in posts]); print('Messages columns:', [r['Field'] for r in msgs])"
+```
+
+You should see:
+- **Posts**: id, user_id, content, image_url, video_url, created_at, updated_at, media_type
+- **Messages**: id, conversation_id, sender_id, content, created_at, message_type, media_url
+
+**Check Supabase configuration:**
+
+```bash
+cd server
+python -c "import os; from dotenv import load_dotenv; load_dotenv(); print('SUPABASE_URL:', os.getenv('SUPABASE_URL')); print('SUPABASE_KEY length:', len(os.getenv('SUPABASE_KEY', '')) if os.getenv('SUPABASE_KEY') else 0); print('SUPABASE_BUCKET:', os.getenv('SUPABASE_BUCKET'))"
+```
+
+You should see your Supabase URL, key length > 100, and bucket name.
+
+---
+
