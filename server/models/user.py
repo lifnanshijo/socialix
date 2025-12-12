@@ -106,17 +106,26 @@ class User:
         if not user:
             return None
         
+        # Helper function to convert bytes to string if needed
+        def safe_decode(value):
+            if value is None:
+                return None
+            if isinstance(value, bytes):
+                return value.decode('utf-8')
+            return value
+        
         # Avatar and cover_image are now URLs from Supabase
-        avatar_data = user.get('avatar') if user.get('avatar') else None
-        cover_image_data = user.get('cover_image') if user.get('cover_image') else None
+        avatar_data = safe_decode(user.get('avatar'))
+        cover_image_data = safe_decode(user.get('cover_image'))
+        bio_data = safe_decode(user.get('bio'))
         
         return {
             'id': user['id'],
             'username': user['username'],
             'email': user['email'],
-            'bio': user.get('bio'),
+            'bio': bio_data,
             'avatar': avatar_data,
             'cover_image': cover_image_data,
-            'created_at': user['created_at'].isoformat() if isinstance(user['created_at'], datetime) else user['created_at'],
-            'updated_at': user.get('updated_at').isoformat() if isinstance(user.get('updated_at'), datetime) else user.get('updated_at')
+            'created_at': user['created_at'].isoformat() if isinstance(user['created_at'], datetime) else str(user['created_at']),
+            'updated_at': user.get('updated_at').isoformat() if user.get('updated_at') and isinstance(user.get('updated_at'), datetime) else str(user.get('updated_at')) if user.get('updated_at') else None
         }

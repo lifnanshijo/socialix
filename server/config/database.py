@@ -211,6 +211,12 @@ def execute_query(query, params=None, fetch=False, commit=False):
         cursor.execute(query, params or ())
         if fetch:
             result = cursor.fetchall()
+            # Convert any bytes to strings in the result
+            if result:
+                for row in result:
+                    for key, value in row.items():
+                        if isinstance(value, bytes):
+                            row[key] = value.decode('utf-8')
             return result
         else:
             if commit or not fetch:

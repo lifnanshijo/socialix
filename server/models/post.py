@@ -150,22 +150,36 @@ class Post:
                     return obj.get(key, default)
                 return getattr(obj, key, default)
             
+            # Helper function to convert bytes to string if needed
+            def safe_decode(value):
+                if value is None:
+                    return None
+                if isinstance(value, bytes):
+                    return value.decode('utf-8')
+                return value
+            
             # Image and video are now URLs from Supabase
-            image_url = safe_get(post, 'image_url')
-            video_url = safe_get(post, 'video_url')
+            image_url = safe_decode(safe_get(post, 'image_url'))
+            video_url = safe_decode(safe_get(post, 'video_url'))
+            content = safe_decode(safe_get(post, 'content'))
             
             created_at = safe_get(post, 'created_at')
             updated_at = safe_get(post, 'updated_at')
             
             if isinstance(created_at, datetime):
                 created_at = created_at.isoformat()
+            elif created_at:
+                created_at = str(created_at)
+                
             if isinstance(updated_at, datetime):
                 updated_at = updated_at.isoformat()
+            elif updated_at:
+                updated_at = str(updated_at)
             
             return {
                 'id': safe_get(post, 'id'),
                 'userId': safe_get(post, 'user_id'),
-                'content': safe_get(post, 'content'),
+                'content': content,
                 'imageUrl': image_url,
                 'videoUrl': video_url,
                 'mediaType': safe_get(post, 'media_type', 'text'),
